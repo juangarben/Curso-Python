@@ -136,7 +136,7 @@ def Absentismo(persona,ausencia):
 lista_alumnos=[]
 
 Profesor1=Profesor("Juan",50,"H","matemáticas")
-Profesor1.Absentismo(20)
+
 
 Aula1=Aula("A01",11,"matemáticas",Profesor1,lista_alumnos)
 
@@ -151,6 +151,10 @@ ALU_8=Estudiante("Anita",12,"M",8,Aula1)
 ALU_9=Estudiante("Paloma",12,"M",8,Aula1)
 ALU_10=Estudiante("Carlitos",12,"H",10,Aula1)
 ALU_11=Estudiante("Javier",12,"H",10,Aula1)
+
+
+Absentismo(Profesor1,20)
+Absentismo(ALU_3,51)
 
 Aula1.DarClase()
     
