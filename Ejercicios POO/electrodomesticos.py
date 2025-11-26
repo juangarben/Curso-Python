@@ -192,7 +192,7 @@ class Ejecutable(Electrodomestico):
                 Lista_Electrodomestico.append(i)
                 Lista_precios_Electrodomestico.append(i.precioFinal())
                 
-        #Mostramos los atributos y precios totals de cada tipo de electrodoméstico:
+        #Mostramos los atributos y precios de cada tipo de electrodoméstico:
         
         print(" ____________________ LISTA LAVADORAS __________________________")
         for i in Lista_Lavadoras:
@@ -219,7 +219,6 @@ class Ejecutable(Electrodomestico):
         
         TOTAL_ELECTRODOMESTICOS=sum([int(i) for i in Lista_precios_Electrodomestico])
         print(f"\nTOTAL OTROS ELECTRODOMÉSTICOS = {TOTAL_ELECTRODOMESTICOS}€\n")
-        
         # Por ejemplo, si tenemos un Electrodomestico con un precio final de 300, una lavadora de 200 y una televisión de 500, 
         # el resultado final sera de 1000 (300+200+500) para electrodomésticos, 200 para lavadora y 500 para televisión.         
         

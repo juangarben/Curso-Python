@@ -1,8 +1,2 @@
-miLavadora=Lavadora(20,"","",40,31)
-# miLavadora.get_atributos()
-# miLavadora.getCarga()
-# print("________________________________________")
-# miTele=Television(100,"azul","D",20,41,False)
-# miTele.get_atributos()
-# miTele.get_resolucion_sintonizador()
-# print("________________________________________")
+if (isinstance(objeto,Serie)):
+        #     return [i.num_temporadas for i in objeto]
