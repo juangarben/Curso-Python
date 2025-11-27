@@ -1,4 +1,9 @@
 
-        # for item in self.lista_bebidas: #getattr(objeto, 'nombre_del_atributo')
-        #     if not bebida.ID in item:
-        #         self.lista_bebidas.append(bebida)
+    # E2.plus()
+    # E2.getAtributos()
+    
+    # R1.plus()
+    # R1.getAtributos()
+    
+    # R2.plus()
+    # R2.getAtributos()
