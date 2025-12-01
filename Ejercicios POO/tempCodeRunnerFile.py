@@ -1,2 +1,1 @@
-Mi_baraja_francesa.mostrar_baraja()
-Mi_baraja_francesa.cartas_disponibles()
+print(pregunta) #quitamos los primeros caracteres (# ;P;)
