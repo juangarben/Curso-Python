@@ -171,7 +171,7 @@ class pregunta(test):
             return False
     
     def getAtributos(self):
-        #Indica la pregunta, las opciones, la respuesta y los puntos
+        #Indica la pregunta, las opciones, la respuesta y los puntos. Mostramos cada diccionario
         print(f"Diccionario de preguntas y opciones:\n\n{self.diccionario_preguntas}\n")
         print(f"Diccionario de preguntas y respuestas:\n\n{self.diccionario_respuestas}\n")
         print(f"Diccionario de preguntas y puntos:\n\n{self.diccionario_puntuacion}\n")
