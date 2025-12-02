@@ -49,7 +49,7 @@ class test:
        
     def cargarPreguntas(self):
        
-        # cargarPreguntas(String fichero): carga todas las preguntas del fichero
+        # cargarPreguntas(String fichero): carga todas las preguntas del fichero y las guarda en varios diccionarios (preguntas, respuestas y puntuación)
         
         with open(self.fichero, "r") as fichero:
             
@@ -103,7 +103,7 @@ class test:
         # realizarTest(): empieza el test y empieza a formular las preguntas
         
         self.cargarPreguntas()
-        self.preguntas=list(self.diccionario_preguntas.keys())
+        self.preguntas=list(self.diccionario_preguntas.keys()) #lista de preguntas
         
         for i in range(len(self.diccionario_preguntas)):
             
@@ -127,6 +127,7 @@ class test:
             self.siguientePregunta()
         
         print(f"\n____________________ PUNTUACIÓN {self.puntos_acumulados} ______________________\n")
+        pregunta.getAtributos(self)
         
                     
 class pregunta(test):
@@ -144,9 +145,8 @@ class pregunta(test):
     # Sus métodos son:
     
     def __init__(self, fichero):
-       super().__init__(fichero)
+       super().__init__(fichero)  
        
-       pass
         
     def mostrarPregunta(self,num_pregunta):
         # mostrarPregunta(): muestra la pregunta con sus opciones.
@@ -170,12 +170,12 @@ class pregunta(test):
            
             return False
     
-    
-    def getAtributos(self,num_pregunta):
+    def getAtributos(self):
         #Indica la pregunta, las opciones, la respuesta y los puntos
-        print(self.preguntas)
-        #print(f"{self.diccionario_preguntas[self.preguntas[num_pregunta]]}")
-        pass
+        print(f"Diccionario de preguntas y opciones:\n\n{self.diccionario_preguntas}\n")
+        print(f"Diccionario de preguntas y respuestas:\n\n{self.diccionario_respuestas}\n")
+        print(f"Diccionario de preguntas y puntos:\n\n{self.diccionario_puntuacion}\n")
+        
 
 class opcion(pregunta):
     # Una opción se compone de:
@@ -188,6 +188,7 @@ class opcion(pregunta):
         self.correcto=correcto
         
         
+        
 ######################################################################################################################
 
 miTest=test(r"C:\Users\Juan Antonio\Documents\curso phyton\Ejercicios POO\test.txt")
@@ -195,8 +196,8 @@ miTest=test(r"C:\Users\Juan Antonio\Documents\curso phyton\Ejercicios POO\test.t
 print(f"_______ Empezamos el test .... ________________\n")
 miTest.realizarTest()
 print("_______________________")
-miPregunta=pregunta(miTest)
-miPregunta.getAtributos(1)
+
+
 
 
 
