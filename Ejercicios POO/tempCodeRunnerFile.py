@@ -1,1 +1,1 @@
-print(pregunta) #quitamos los primeros caracteres (# ;P;)
+            print(preguntas)
