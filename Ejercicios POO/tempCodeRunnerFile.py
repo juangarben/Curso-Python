@@ -1,2 +1,4 @@
-mi_persona=Persona("juan",18,"H",50,1.9)
-# print(mi_persona.esMayorDeEdad())
+except:
+                    print("Error: Para ingresar efectivo debes loggearte primero")
+                    input("Presiona Enter para continuar...")
+                
