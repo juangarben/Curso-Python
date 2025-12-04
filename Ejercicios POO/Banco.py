@@ -4,16 +4,17 @@ import random
 class Usuario:
     
     def __init__(self,nombre,password,num_cuenta):
-        self.__nombre=nombre
-        self.__password=password
-        self.__num_cuenta=num_cuenta
+        self.nombre=nombre
+        self.password=password
+        self.num_cuenta=num_cuenta
         self.saldo=0
         self.logging=False
+        self.descubierto=0
         
     def Inicia_sesion(self,nombre,password):
         
-        if nombre==self.__nombre and password==self.__password:
-            print("### Logging correcto!! ###")
+        if nombre==self.nombre and password==self.password:
+            print(f"### Bienvenido {self.nombre} ###")
             self.logging=True
             return True
         else:
@@ -23,7 +24,7 @@ class Usuario:
             
     def __str__(self):
         
-        return f"\nNombre: {self.__nombre}\tPassword: {self.__password}\tCCC:{self.__num_cuenta}\tSaldo:{self.saldo}\n"
+        return f"\nNombre: {self.nombre}\tPassword: {self.password}\tCCC:{self.num_cuenta}\tSaldo:{self.saldo}\tServicio Descubierto:{self.descubierto}\n"
             
 
 class Cajero_automatico:
@@ -52,20 +53,22 @@ class Cajero_automatico:
     
     def Ingresar_efectivo(self,usuario,cantidad):
         usuario.saldo+=cantidad
+        
     
-    
-
 class Ejecutable:
     
     def __init__(self):
         
-        opciones_menu=["Hazte cliente","Inicio Sesión","Consulta Saldo","Retirada efectivo","Ingreso efectivo"]
+        opciones_menu=["Hazte cliente","Iniciar Sesión","Consultar Saldo","Retirar efectivo","Ingresar efectivo","Hacer transferencia","Contratar descubirto","Cerrar Sesión","Cancelar Cuenta"]
         lista_usuarios=[]
         self.salir=False
         self.logging=False
     
         while not self.salir:
+            
+           
             self.opcion_elegida=Menu("Cajero Automático",opciones_menu).crear_menu()
+                
             
             if self.opcion_elegida==1: #Hazte cliente
                 
@@ -76,21 +79,24 @@ class Ejecutable:
 
             elif self.opcion_elegida==2: #Inicia sesión
                 try:
-                    nombre_usuario_answ=input("Introduce el nombre de usuario: ")
-                    password_answ=input("Introduce la clave: ")
-                    contador=0
+                    if not self.logging:
+                        nombre_usuario_answ=input("Introduce el nombre de usuario: ")
+                        password_answ=input("Introduce la clave: ")
+                        contador=0
                     
-                    for usuario in lista_usuarios:
-                        if usuario.Inicia_sesion(nombre_usuario_answ,password_answ):
-                            miUsuario=usuario
-                            self.logging=True
-                            break
-                        else:
-                            contador+=1
-                            self.logging=False
-                    
-                    if contador==len(lista_usuarios):
-                        print("Usuario o clave incorrectos")
+                        for usuario in lista_usuarios:
+                            if usuario.Inicia_sesion(nombre_usuario_answ,password_answ):
+                                miUsuario=usuario
+                                self.logging=True
+                                break
+                            else:
+                                contador+=1
+                                self.logging=False
+                        
+                        if contador==len(lista_usuarios):
+                            print("Usuario o clave incorrectos")
+                    else:
+                        print("Error: Ya hay una sesión iniciada, debes cerrar sesión si quieres cambiar de usuario")        
                         
                     input("Presiona Enter para continuar...")
                     
@@ -139,14 +145,56 @@ class Ejecutable:
                         Cajero_automatico.Ingresar_efectivo(self,miUsuario,cantidad)
                         print("### Ingreso realizado correctamente!!! ###")
                         input("Presiona Enter para continuar...")
+                        
                     else:
                         print("Error: Para ingresar efectivo debes loggearte primero")
                         input("Presiona Enter para continuar...")
+                 
                 except:
                     print("Error: Para ingresar efectivo debes loggearte primero")
                     input("Presiona Enter para continuar...")
+                    
+                    
+            elif self.opcion_elegida==7:
+                
+                cantidad_descubierto=input(f"Por cada 10€ de saldo negativo el precio del servicio es 1€\nIndica la cantidad máxima de descubierto que quieres contratar: ")
+                miUsuario.descubierto=cantidad_descubierto
+                print(f"Servicio de descubierto contratado, ahora tu cuenta se puede quedar en negativo hasta {cantidad_descubierto}€")
+                
+                    
+            elif self.opcion_elegida==8:
+                try:
+                    if self.logging:
+                        
+                        self.logging=False
+                        print(f"Hasta pronto {miUsuario.nombre}!!!!")
+                        input("Presiona Enter para continuar...")
+                        
+                    else:
+                        print("Error: No se ha iniciado sesión previamente")
+                        input("Presiona Enter para continuar...")
+                    
+                except:
+                        print("Error: No se ha iniciado sesión previamente")
+                        input("Presiona Enter para continuar...")
+                    
                 
                 
+            elif self.opcion_elegida==9:
+                
+                if self.logging:
+                
+                    respuesta=input(f"¿Estás seguro que quieres borrar el usuario:{miUsuario.nombre} (S/N)?")
+                    
+                    if respuesta=="S" or respuesta=="s":
+                        lista_usuarios.remove(miUsuario)
+                        self.logging=False
+                        print("El usuario ha sido eliminado")
+                else:
+                    print("Error: No se ha iniciado sesión previamente")
+                
+                input("Presiona Enter para continuar...")
+            
             else:
                 self.salir=True
         
@@ -155,10 +203,13 @@ class Ejecutable:
 
 Ejecutable()
 
-""" Mejoras a implementar:
-    
-    1.- que ponga el nombre de usuario en el menu
+""" Mejoras a implementar en el proyecto:
+
+    1.- Decorador menu para que pona el nombre usuario
     2.- que se puedan hacer transferencias entre usuarios
-    3.- que te tengas que desloggear para volver a iniciar sesión
+    4.- Opcion contratar descubierto con un límite de saldo negativo
+    6.- Documentar todo el proyecto
+    7.- Uso de getters y setters
+ 
     
 """
