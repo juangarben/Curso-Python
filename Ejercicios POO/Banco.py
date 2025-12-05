@@ -1,4 +1,8 @@
-
+#####################################
+#Author=JGB
+#version=4.0
+#Last update =5-12-2025
+#####################################
 
 from Modulo_Menu import Menu
 import random,os
