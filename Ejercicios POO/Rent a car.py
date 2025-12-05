@@ -205,6 +205,7 @@ class Ejecutable:
                 
             
             elif opcion_elegida==6: #Devolver vehiculo
+                #pasar la matrícula en lugar de la clase Rental
                 input("Presiona Enter para continuar...")
                 
             
@@ -226,7 +227,7 @@ class Ejecutable:
 ###################################################################
 
 Ejecutable()
-#prueba
+
         
         
         
