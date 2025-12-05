@@ -3,7 +3,7 @@ Programa en POO que simula una agencia de alquier de coches
 
 """
 from Modulo_Menu import Menu
-from datetime import date
+from datetime import datetime,date
 import random,os
 
 class Vehiculo:
@@ -107,13 +107,19 @@ class Agencia:
             print("Error: Cliente no encontrado")
         
     def add_rental(self,dni,matricula,fecha_inicio,fecha_fin):
+        
         self.dni=dni
         self.matricula=matricula
-        self.fecha_inicio=fecha_inicio
-        self.fecha_fin=fecha_fin
-        cliente=next(c for c in self.lista_clientes if c.dni==dni)
-        vehiculo=next(v for v in self.lista_vehiculos if v.matricula==matricula)
-        self.lista_rentals.append(Rental(cliente,vehiculo,self.fecha_inicio,self.fecha_fin))
+        
+        try:
+            self.fecha_inicio=datetime.strptime(fecha_inicio, '%d-%m-%Y')
+            self.fecha_fin=datetime.strptime(fecha_fin, '%d-%m-%Y')
+            cliente=next(c for c in self.lista_clientes if c.dni==dni)
+            vehiculo=next(v for v in self.lista_vehiculos if v.matricula==matricula)
+            self.lista_rentals.append(Rental(cliente,vehiculo,self.fecha_inicio,self.fecha_fin))
+            print("Alquiler realizado correctamente")
+        except:
+            print("Error: No ha sido posible realizar el alquiler, datos incorrectos")
         
     def terminar_rental(self,rental,km):
         
@@ -190,6 +196,11 @@ class Ejecutable:
             
             
             elif opcion_elegida==5: #Alquilar vehiculo
+                dni=input("Introduce el DNI del cliente: ")
+                matricula=input("Introduce la matricula: ")
+                fecha_inicio=input("Introduce la fecha de inicio: ")
+                fecha_fin=input("Introduce la fecha de fin: ")
+                miAgencia.add_rental(dni,matricula,fecha_inicio,fecha_fin) 
                 input("Presiona Enter para continuar...")
                 
             
