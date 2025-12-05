@@ -1,8 +1,21 @@
+
 import os,random
 
 os.system('cls')
 
 class Menu:
+    """Clase Menu: Crea un menú en la consola
+    
+    Argumentos: titulo y lista de strings con las distintas opciones del menú (el último índice de la lista es "salir" y se genera automáticamente)
+    
+    Methods:
+    - refrescar()
+        refresca la pantalla cada vez que hay un error al elegir una opcion
+    
+
+    Returns:
+        - un int con la opcion del menu seleccionada, 0 si se selecciona salir
+    """
     
     def __init__(self,titulo="",lista_menu=[]):
         self.titulo=titulo
@@ -54,68 +67,10 @@ class Menu:
                     self.refrescar()
                     return self.opcion
                     
-                # if opcion>0 and opcion<7:
-                        
-                #     if (opcion==1):#Listar contactos
-                        
-                #         self.Agenda.listarContactos()
-                                                
-                #         input("Presiona Enter para continuar...")
-                #         self.refrescar()
-            
-                #     if (opcion==2): #Añadir contacto
-                        
-                #         nombre_contacto=input("Introduce el nombre: ")
-                #         telefono_contacto=input("Introduce el teléfono: ")
-                #         Contacto=contacto(nombre_contacto,telefono_contacto)
-                #         self.Agenda.aniadirContacto(Contacto)
-                        
-                #         input("Presiona Enter para continuar...")
-                #         self.refrescar()
-                        
-                #     if (opcion==3): #Eliminar contacto
-                        
-                #         nombre_eliminar=input("Introduce el nombra a eliminar: ")
-                #         self.Agenda.eliminarContacto(nombre_eliminar)
-                        
-                #         input("Presiona Enter para continuar...")
-                #         self.refrescar()
-                    
-                    
-                #     if (opcion==4): #Buscar contacto
-                        
-                #         nombre_buscar=input("Introduce el nombre a buscar: ")
-                #         self.Agenda.buscaContacto(nombre_buscar)
-                        
-                #         input("Presiona Enter para continuar...")
-                #         self.refrescar()
-                            
-                #     if (opcion==5): #Consultar huecos agenda
-                    
-                #         self.Agenda.huecosLibres()
-                    
-                #         input("Presiona Enter para continuar...")
-                #         self.refrescar()
-                            
-                #     if (opcion==6):
-                    
-                #         print("Hasta pronto!!!")
-                #         input("Presiona Enter para continuar...")
-                #         self.salir=True
-                
-                # # else:
-                #     print("Error: Opción incorrecta.")
-                    
-                #     input("Presiona Enter para continuar...")
-                #     self.refrescar()
-            
             except:
                 input(f"Error opción no válida.\nPresiona Enter para continuar...")
                 self.refrescar()
                 return self.opcion
                 
 
-# opciones_menu=["Crear usuario","Iniciar Sesion","Consultar Saldo","Retirar efectivo","Ingresar Efectivo","Hacer Transferencia"]
-# miMenu=Menu("banco",opciones_menu)
-# print(miMenu.crear_menu())
             
