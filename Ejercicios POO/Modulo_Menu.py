@@ -32,18 +32,13 @@ class Menu:
         
         print(f"__________________________ MENU: {self.titulo}  ______________________________\n")
         
-        
  # Crea un menú con opciones pasadas como argumento de la lista por consola para probar todas estas funcionalidades.
-        num_orden=1
         
-        for opciones in self.lista_menu:
+        for num_orden,opciones in enumerate(self.lista_menu,1):
             print(f"{num_orden}. {opciones}\n")
-            num_orden+=1
-            
         
-        print(f"{num_orden}. Salir")
+        print(f"{num_orden+1}. Salir")
         print("______________________________________________________________________\n")
-        
         
         while not self.salir:
             
@@ -51,13 +46,13 @@ class Menu:
                 
                 self.opcion=int(input("Elige una opcion: "))
                 
-                if self.opcion>0 and self.opcion<num_orden:
+                if self.opcion>0 and self.opcion<=num_orden:
                     
                     self.salir=True
                     return self.opcion
                     
                     
-                elif self.opcion==num_orden: 
+                elif self.opcion==num_orden+1: 
                     input(f"Hasta pronto!!\nPresiona Enter para continuar...")
                     self.salir=True
                     return 0

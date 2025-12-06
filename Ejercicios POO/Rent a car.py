@@ -29,11 +29,11 @@ class Cliente:
         self.nombre=nombre
         self.edad=edad
         self.dni=dni
-        self.historial_retals=[]
+        self.historial_rentals=[]
     
     def add_rental(self,rental):
         
-        self.historial_retals.append(rental)
+        self.historial_rentals.append(rental)
         
     def __str__(self):
         return f"Nombre cliente: {self.nombre}\tEdad: {self.edad}años\tDNI: {self.dni}\n"
@@ -53,8 +53,8 @@ class Rental:
     
     def terminar_rental(self,km):
         self.km=km
-        self.vehiculo.disponibilidad=False
         self.vehiculo.km+=self.km
+        self.vehiculo.disponibilidad=True
         self.cliente.historial_rentals.append(self)
         
     def __str__(self):
@@ -74,7 +74,6 @@ class Agencia:
     def add_vehiculos(self,vehiculo):
         self.vehiculo=vehiculo
         self.lista_vehiculos.append(vehiculo)
-        self.vehiculo.disponibilidad=False
         
     def remove_vehiculo(self,matricula):
         
@@ -117,6 +116,7 @@ class Agencia:
             cliente=next(c for c in self.lista_clientes if c.dni==dni)
             vehiculo=next(v for v in self.lista_vehiculos if v.matricula==matricula)
             self.lista_rentals.append(Rental(cliente,vehiculo,self.fecha_inicio,self.fecha_fin))
+            vehiculo.disponibilidad=False
             print("Alquiler realizado correctamente")
         except:
             print("Error: No ha sido posible realizar el alquiler, datos incorrectos")
@@ -130,8 +130,18 @@ class Agencia:
         
     def listar_vehiculos(self): 
         
+        print(f"\n_______________ Vehiculos disponibles _________________\n")
+        
         for vehiculo in self.lista_vehiculos:
-            print(vehiculo)
+            if vehiculo.disponibilidad:
+                print(vehiculo)
+        
+        print(f"\n_______________ Vehiculos alquilados _________________\n")
+        
+        for vehiculo in self.lista_vehiculos:
+            if not vehiculo.disponibilidad:
+                print(vehiculo)
+        
                 
     def listar_clientes(self): 
         
@@ -163,13 +173,16 @@ class Ejecutable:
             
             if opcion_elegida == 1: #Dar de alta un vehiculo
                 
-                marca=input("Indica la marca: ")
-                modelo=input("Indica el modelo: ")
-                matricula=input("indica la matricula: ")
-                km=input("Indica los km: ")
-                precio_dia=float(input("Indica el precio por dia: "))
-                
-                miAgencia.add_vehiculos(Vehiculo(marca,modelo,matricula,km,precio_dia))
+                try:
+                    marca=input("Indica la marca: ")
+                    modelo=input("Indica el modelo: ")
+                    matricula=input("indica la matricula: ")
+                    km=int(input("Indica los km: "))
+                    precio_dia=float(input("Indica el precio por dia: "))
+                    
+                    miAgencia.add_vehiculos(Vehiculo(marca,modelo,matricula,km,precio_dia))
+                except:
+                    print("Error: Los datos introducidos son incorrectos")
                 
                 input("Presiona Enter para continuar...")
             
@@ -205,7 +218,21 @@ class Ejecutable:
                 
             
             elif opcion_elegida==6: #Devolver vehiculo
-                #pasar la matrícula en lugar de la clase Rental
+                
+                dni=input("Introduce el DNI del cliente: ")
+                matricula=input("Introduce la matricula: ")
+                
+                try:
+                    km=int(input("Indica los km: "))
+                    cliente=next(c for c in miAgencia.lista_clientes if c.dni==dni)
+                    vehiculo=next(v for v in miAgencia.lista_vehiculos if v.matricula==matricula)
+                    miRental=next(r for r in miAgencia.lista_rentals if r.cliente==cliente and r.vehiculo==vehiculo)
+                    miAgencia.terminar_rental(miRental,km)
+                    print(f"Devolución del vehiculo {vehiculo} realizada correctamente")
+                    
+                except:
+                    print("Error: Los datos introducidos son incorrectos")
+                
                 input("Presiona Enter para continuar...")
                 
             
@@ -228,7 +255,13 @@ class Ejecutable:
 
 Ejecutable()
 
-        
+"""Errores test:
+
+Indicar el coste del alquiler cuando se alquila
+
+
+"""
+
         
         
     
