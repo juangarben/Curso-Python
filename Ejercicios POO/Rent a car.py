@@ -115,7 +115,9 @@ class Agencia:
             self.fecha_fin=datetime.strptime(fecha_fin, '%d-%m-%Y')
             cliente=next(c for c in self.lista_clientes if c.dni==dni)
             vehiculo=next(v for v in self.lista_vehiculos if v.matricula==matricula)
-            self.lista_rentals.append(Rental(cliente,vehiculo,self.fecha_inicio,self.fecha_fin))
+            rental=Rental(cliente,vehiculo,self.fecha_inicio,self.fecha_fin)
+            self.lista_rentals.append(rental)
+            print(f"El coste del alquiler es: {rental.calcular_coste()}€")
             vehiculo.disponibilidad=False
             print("Alquiler realizado correctamente")
         except:
@@ -152,8 +154,6 @@ class Agencia:
         
         for rental in self.lista_rentals:
             print(rental)
-    
-    
             
 
 class Ejecutable:
@@ -228,7 +228,7 @@ class Ejecutable:
                     vehiculo=next(v for v in miAgencia.lista_vehiculos if v.matricula==matricula)
                     miRental=next(r for r in miAgencia.lista_rentals if r.cliente==cliente and r.vehiculo==vehiculo)
                     miAgencia.terminar_rental(miRental,km)
-                    print(f"Devolución del vehiculo {vehiculo} realizada correctamente")
+                    print(f"{vehiculo}\n Devolución realizada correctamente")
                     
                 except:
                     print("Error: Los datos introducidos son incorrectos")
@@ -255,12 +255,7 @@ class Ejecutable:
 
 Ejecutable()
 
-"""Errores test:
 
-Indicar el coste del alquiler cuando se alquila
-
-
-"""
 
         
         
