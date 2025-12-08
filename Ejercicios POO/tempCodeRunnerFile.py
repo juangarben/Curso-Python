@@ -1,2 +1,4 @@
- # for usuario in self.lista_usuarios:
-                    #     print(usuario)
+self.lista_clientes.append(self.cliente)
+        # print("Cliente registrado correctamente")
+        # self.listar_clientes()
+        
