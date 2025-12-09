@@ -48,16 +48,15 @@ class Clinica:
         if len(self.lista_clientes)>0:
             nombre=input("Introduce el nombre del cliente: ")
             apellidos=input("Introduce los apellidos del cliente: ")
-        
-            
+              
             for indice,cliente in enumerate(self.lista_clientes,1):
                 
                     if cliente.nombre==nombre and cliente.apellidos==apellidos:
-                        return cliente
+                        return cliente,True
                     
                     if indice==len(self.lista_clientes):
                         print("Error: El cliente no existe")
-                        return False
+                        return None,False
         else:
             print("Error no hay clientes registrados")
             return False
@@ -88,12 +87,21 @@ class Clinica:
             print("Error no hay clientes registrados")
             
     def registrar_visita(self,cliente,mascota):
+        
         self.cliente=cliente
         self.mascota=mascota
-        fecha_hora=datetime.now()
-        resumen_visita=input("Introduce el resumen de la visita: ")
-        visita=f"\n_______________ HISTORIAL DE VISITAS ________________\nNombre cliente: {self.cliente.nombre} {self.cliente.apellidos}\n{self.mascota}\n{fecha_hora}\nResumen visita:\n{resumen_visita}\n"
-        self.cliente.historial_visitas.append(visita)
+        
+        if (self.cliente.validar_mascota_cliente(self.mascota.nombre,self.mascota.tipo)[1]):
+    
+            fecha_hora=datetime.now()
+            resumen_visita=input("Introduce el resumen de la visita: ")
+            visita=f"\n_______________ HISTORIAL DE VISITAS ________________\nNombre cliente: {self.cliente.nombre} {self.cliente.apellidos}\n{self.mascota}\n{fecha_hora}\nResumen visita:\n{resumen_visita}\n"
+            self.cliente.historial_visitas.append(visita)
+            
+        else:
+                     
+            print("Error: Mascota no encontrada")
+        
                         
 class Cliente:
     
@@ -104,40 +112,45 @@ class Cliente:
         self.lista_mascotas=[]
         self.historial_visitas=[]
         
-    def validar_mascota(self,nombre,tipo):
+    def validar_mascota_cliente(self,nombre,tipo):
         
-        for m in self.lista_mascotas:
+        #Comprueba si el nombre y tipo pasados como parámetros
+        #se encuentran en la lista de mascotas del cliente, y en ese caso devuleve el índice la lista y True, 
+        #en caso contrario devuelve índice None y False
+        
+        for i,m in enumerate(self.lista_mascotas):
             
             if m.nombre==nombre and m.tipo==tipo:
                 
-                print("Error: La mascota ya está registrada para este cliente")
-                return False
+                return i,True
         
-        return True
+        return None,False
     
-    def agregar_mascota(self,mascota):
+    def agregar_mascota_cliente(self,mascota):
         
         self.mascota=mascota
         
-        if self.mascota.comprobar_tipo() and self.validar_mascota(self.mascota.nombre,self.mascota.tipo):
+        if self.mascota.comprobar_tipo() and not self.validar_mascota_cliente(self.mascota.nombre,self.mascota.tipo)[1]:
             
             self.lista_mascotas.append(self.mascota)   
             print(f"La mascota se ha añadido correctamente al cliente {self.nombre} {self.apellidos}\n")
             return True
         else:
+            print("Error: La mascota no se ha podido añadir al cliente")
             return False
     
-    def eliminar_mascota(self,mascota):
+    def eliminar_mascota_cliente(self,mascota):
         
         self.mascota=mascota
         
-        for i,m in enumerate(self.lista_mascotas):
-            if m.nombre==self.mascota.nombre and m.tipo==self.mascota.tipo:
-                del self.lista_mascotas[i]
-                print("Mascota eliminada correctamente")
-                return 
+        indice,resultado=self.validar_mascota_cliente(self.mascota.nombre,self.mascota.tipo)
+        
+        if resultado:
+            del self.lista_mascotas[indice]
+            print("Mascota eliminada correctamente")
             
-        print("Error: La mascota no existe")
+        else:
+            print("Error: La mascota no existe")
              
     
     def __str__(self):
@@ -168,6 +181,11 @@ class Mascota:
             print("Error: Tipo de animal incorrecto")
             return False
     
+    def set_mascota(self):
+        
+        self.nombre=input("Introduce el nombre de la mascota: ")
+        self.tipo=input("Introduce el tipo de la mascota: ")
+        return self
     
     def __str__(self):
         return f"Nombre mascota: {self.nombre} Tipo: {self.tipo}"
@@ -181,7 +199,6 @@ class Ejecutable:
         lista_menu=["Registrar cliente","Agregar mascota a cliente","Dar de baja mascota a cliente","Listar clientes","Registrar visita","Imprimir historial visitas"]
         
         salir=False
-        
     
         while not salir:
             os.system('cls')
@@ -197,27 +214,22 @@ class Ejecutable:
             
             elif opcion_elegida==2: #Agregar mascota a cliente
                 
-                cliente=miClinica.validar_cliente()
+                cliente,resultado=miClinica.validar_cliente()
                 
-                if cliente!=False:
-                    
-                    nombre_mascota=input("Introduce el nombre de la mascota: ")
-                    tipo_mascota=input("Introduce el tipo de la mascota: ")
-                    cliente.agregar_mascota(Mascota(nombre_mascota,tipo_mascota))
+                if resultado:
+
+                    cliente.agregar_mascota_cliente(Mascota(self,self).set_mascota())
                                         
                 input("Presiona Enter para continuar...")
             
             elif opcion_elegida==3: #Dar de baja mascota a cliente
                 
-                cliente=miClinica.validar_cliente()
+                cliente,resultado=miClinica.validar_cliente()
                 
-                if cliente!=False:
+                if resultado:
                     
-                    nombre_mascota=input("Introduce el nombre de la mascota: ")
-                    tipo_mascota=input("Introduce el tipo de la mascota: ")
-                    cliente.eliminar_mascota(Mascota(nombre_mascota,tipo_mascota))
-                
-                
+                    cliente.eliminar_mascota_cliente(Mascota(self,self).set_mascota())
+                 
                 input("Presiona Enter para continuar...")
                 
             elif opcion_elegida==4: #Listar clientes
@@ -228,21 +240,20 @@ class Ejecutable:
             
             elif opcion_elegida==5: # Registrar visita
                 
-                cliente=miClinica.validar_cliente()
+                cliente,resultado=miClinica.validar_cliente()
                 
-                if cliente!=False:
-                    nombre_mascota=input("Introduce el nombre de la mascota: ")
-                    tipo_mascota=input("Introduce el tipo de la mascota: ")
-                    miClinica.registrar_visita(cliente,Mascota(nombre_mascota,tipo_mascota))
+                if resultado:
+                 
+                    miClinica.registrar_visita(cliente,Mascota(self,self).set_mascota())
                     
                 input("Presiona Enter para continuar...")
                 
                 
             elif opcion_elegida==6: # Imprimir historial visitas
                 
-                cliente=miClinica.validar_cliente()
+                cliente,resultado=miClinica.validar_cliente()
                 
-                if cliente!=False:
+                if resultado:
         
                     with open(f'{cliente.nombre}_{cliente.apellidos}_historial.txt', 'w', encoding='utf-8') as fichero:
                         for v in cliente.historial_visitas:
@@ -258,7 +269,8 @@ class Ejecutable:
 
 Ejecutable()
 #MEJORAS:
-#Compruebe el nombre de la mascota al registrar visitas
-#Reutilizar el método validar mascota de la clase Cliente
+#Añadir la opción de dar de baja un cliente
+#Documentar
+
 
     
