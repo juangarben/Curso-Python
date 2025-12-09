@@ -1,27 +1,31 @@
 """
 Gestión clinica Veterinaria en POO, con las siguientes especificaciones de la APP:
 
-1. Registrar cliente
+1. Registrar cliente --> OK
     
     Para registrar un cliente se requiere ingresar Nombre y Apellido del cliente. 
     Una vez ingresados los datos, se deben almacenar correctamente.
     
-2. Agregar mascota a cliente
+2. Agregar mascota a cliente --> OK
 
     Permite seleccionar un cliente existente e ingresar el Nombre de la mascota y el Tipo de animal (por ejemplo: perro, gato, pájaro). 
     Validar que los campos sean ingresados correctamente y actualizar la información del cliente con una nueva mascota.
+    
+3. Dar de baja mascota a cliente --> OK
 
-3. Listar todos los clientes con sus mascotas
+4. Listar todos los clientes con sus mascotas --> OK
 
     Muestra en pantalla la lista de todos los clientes registrados y, para cada cliente, la información de sus mascotas, 
     incluyendo Nombre de la mascota y Tipo de animal.
+    
+5. Registrar visita --> OK
 
-4. Imprimir historial de visitas
+6. Imprimir historial de visitas --> OK
 
     Permite seleccionar un cliente y generar un archivo de texto (.txt) con el historial de visitas de todas las mascotas asociadas a ese cliente. 
     Cada visita debe incluir la fecha y un breve resumen de la atención recibida.
 
-5. Salir del Programa
+7. Salir del Programa --> OK
 
 Cada una de estas funcionalidades debe estar desarrollada en una función separada que se llame desde el programa principal. 
 El programa debe continuar ejecutándose hasta que el usuario decida salir del programa.
@@ -38,45 +42,113 @@ class Clinica:
         self.nombre=nombre
         self.lista_clientes=[]
         
+        
+    def validar_cliente(self):
+        
+        if len(self.lista_clientes)>0:
+            nombre=input("Introduce el nombre del cliente: ")
+            apellidos=input("Introduce los apellidos del cliente: ")
+        
+            
+            for indice,cliente in enumerate(self.lista_clientes,1):
+                
+                    if cliente.nombre==nombre and cliente.apellidos==apellidos:
+                        return cliente
+                    
+                    if indice==len(self.lista_clientes):
+                        print("Error: El cliente no existe")
+                        return False
+        else:
+            print("Error no hay clientes registrados")
+            return False
 
     def registrar_cliente(self,cliente):
         
         self.cliente=cliente
         
+        if len(self.lista_clientes)==0:
+            self.lista_clientes.append(self.cliente)
+            print("Cliente registrado correctamente")
+            return True
+        
         for c in self.lista_clientes:
-            
             if c.nombre==self.cliente.nombre and c.apellidos==self.cliente.apellidos:
                 print("Error: el cliente ya existe")
-                return True
-                
+                return False     
+            
         self.lista_clientes.append(self.cliente)
         print("Cliente registrado correctamente")
-        self.listar_clientes()
-        
+        return True
         
     def listar_clientes(self):
-    
-        for cliente in self.lista_clientes:
-            print(cliente)
+        if len(self.lista_clientes)>0:
+            for cliente in self.lista_clientes:
+                print(cliente)
+        else:
+            print("Error no hay clientes registrados")
             
-       
-        
-  
-        
+    def registrar_visita(self,cliente,mascota):
+        self.cliente=cliente
+        self.mascota=mascota
+        fecha_hora=datetime.now()
+        resumen_visita=input("Introduce el resumen de la visita: ")
+        visita=f"\n_______________ HISTORIAL DE VISITAS ________________\nNombre cliente: {self.cliente.nombre} {self.cliente.apellidos}\n{self.mascota}\n{fecha_hora}\nResumen visita:\n{resumen_visita}\n"
+        self.cliente.historial_visitas.append(visita)
+                        
 class Cliente:
     
     def __init__(self,nombre,apellidos):
     
         self.nombre=nombre
         self.apellidos=apellidos
+        self.lista_mascotas=[]
+        self.historial_visitas=[]
+        
+    def validar_mascota(self,nombre,tipo):
+        
+        for m in self.lista_mascotas:
+            
+            if m.nombre==nombre and m.tipo==tipo:
+                
+                print("Error: La mascota ya está registrada para este cliente")
+                return False
+        
+        return True
+    
+    def agregar_mascota(self,mascota):
+        
+        self.mascota=mascota
+        
+        if self.mascota.comprobar_tipo() and self.validar_mascota(self.mascota.nombre,self.mascota.tipo):
+            
+            self.lista_mascotas.append(self.mascota)   
+            print(f"La mascota se ha añadido correctamente al cliente {self.nombre} {self.apellidos}\n")
+            return True
+        else:
+            return False
+    
+    def eliminar_mascota(self,mascota):
+        
+        self.mascota=mascota
+        
+        for i,m in enumerate(self.lista_mascotas):
+            if m.nombre==self.mascota.nombre and m.tipo==self.mascota.tipo:
+                del self.lista_mascotas[i]
+                print("Mascota eliminada correctamente")
+                return 
+            
+        print("Error: La mascota no existe")
+             
     
     def __str__(self):
-        return f"\n_______ Cliente _______\nNombre: {self.nombre}\tApellidos: {self.apellidos}\n"
         
-    
-        
-        
-    
+        str="_________________________________________"
+        str+=f"\nCliente Nombre: {self.nombre}\tApellidos: {self.apellidos}\n"
+        for mascota in self.lista_mascotas:
+            str+=f"Mascota Nombre: {mascota.nombre}\tTipo: {mascota.tipo}\n"
+        str+="_________________________________________"
+        return str
+       
 
 class Mascota:
     
@@ -84,7 +156,7 @@ class Mascota:
         
         self.nombre=nombre
         self.tipo=tipo
-    
+        
     def comprobar_tipo(self):
         
         tipos_animales=["perro","gato","ave","conejo","reptil"]
@@ -95,7 +167,10 @@ class Mascota:
         except:
             print("Error: Tipo de animal incorrecto")
             return False
-        
+    
+    
+    def __str__(self):
+        return f"Nombre mascota: {self.nombre} Tipo: {self.tipo}"
 
 class Ejecutable:
     
@@ -103,7 +178,7 @@ class Ejecutable:
         
         miClinica=Clinica("Mis peluditos")
         
-        lista_menu=["Registrar cliente","Agregar mascota a cliente","Listar clientes","Imprimir historial visitas"]
+        lista_menu=["Registrar cliente","Agregar mascota a cliente","Dar de baja mascota a cliente","Listar clientes","Registrar visita","Imprimir historial visitas"]
         
         salir=False
         
@@ -122,26 +197,68 @@ class Ejecutable:
             
             elif opcion_elegida==2: #Agregar mascota a cliente
                 
-                if (Mascota("Denver","perro").comprobar_tipo()):
+                cliente=miClinica.validar_cliente()
                 
-                    print("Mascota agregada correctamente")
-                
+                if cliente!=False:
+                    
+                    nombre_mascota=input("Introduce el nombre de la mascota: ")
+                    tipo_mascota=input("Introduce el tipo de la mascota: ")
+                    cliente.agregar_mascota(Mascota(nombre_mascota,tipo_mascota))
+                                        
                 input("Presiona Enter para continuar...")
             
-            
-            elif opcion_elegida==3: #Listar clientes
+            elif opcion_elegida==3: #Dar de baja mascota a cliente
+                
+                cliente=miClinica.validar_cliente()
+                
+                if cliente!=False:
+                    
+                    nombre_mascota=input("Introduce el nombre de la mascota: ")
+                    tipo_mascota=input("Introduce el tipo de la mascota: ")
+                    cliente.eliminar_mascota(Mascota(nombre_mascota,tipo_mascota))
+                
+                
+                input("Presiona Enter para continuar...")
+                
+            elif opcion_elegida==4: #Listar clientes
                 
                 miClinica.listar_clientes()
                 input("Presiona Enter para continuar...")
             
-            elif opcion_elegida==4: # Imprimir historial visitas
+            
+            elif opcion_elegida==5: # Registrar visita
                 
-                pass
+                cliente=miClinica.validar_cliente()
+                
+                if cliente!=False:
+                    nombre_mascota=input("Introduce el nombre de la mascota: ")
+                    tipo_mascota=input("Introduce el tipo de la mascota: ")
+                    miClinica.registrar_visita(cliente,Mascota(nombre_mascota,tipo_mascota))
+                    
+                input("Presiona Enter para continuar...")
+                
+                
+            elif opcion_elegida==6: # Imprimir historial visitas
+                
+                cliente=miClinica.validar_cliente()
+                
+                if cliente!=False:
         
+                    with open(f'{cliente.nombre}_{cliente.apellidos}_historial.txt', 'w', encoding='utf-8') as fichero:
+                        for v in cliente.historial_visitas:
+                            fichero.write(v)
+                    print(f"Se ha generado correctamente el fichero: {cliente.nombre}_{cliente.apellidos}_historial.txt")
+    
+                input("Presiona Enter para continuar...")
+                
             else:
                 salir=True
 
 ###################################################################
 
 Ejecutable()
+#MEJORAS:
+#Compruebe el nombre de la mascota al registrar visitas
+#Reutilizar el método validar mascota de la clase Cliente
+
     
