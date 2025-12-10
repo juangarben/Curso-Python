@@ -36,50 +36,147 @@ from datetime import datetime,date
 import random,os
 
 class Clinica:
+    """
+    summary:
+        Clase Clinica que implementa los siguientes métodos:
+        
+        buscar_cliente(self,nombre,apellidos)
+        validar_cliente(self)
+        registrar_cliente(self,cliente)
+        eliminar_cliente(self)
+        listar_clientes(self)
+        registrar_visita(self,cliente,mascota)
+        
+    """
     
     def __init__(self,nombre):
         
+        """Atributos:
+            nombre: nombre de la Clinica pasado como argumento cuando se instancia el objeto de la clase
+            lista_clientes[]: Lista de clientes que almacena objetos de la clase Cliente
+        """
+        
         self.nombre=nombre
         self.lista_clientes=[]
+    
+    def buscar_cliente(self,nombre,apellidos):
         
+        """
+        Summary:
+            Comprueba si existe un cliente que coincida en nombre y apellidos. 
+            Devuelve el objeto de la clase Cliente, el resultado de la búsqueda y el índice de la lista de clientes.
+
+        Args:
+            nombre (_type_): nombre del cliente
+            apellidos (_type_): apellidos del cliente
+
+        Returns:
+            object Cliente:objeto de la clase Cliente
+            Bool:Resultado de la búsqueda
+            Int: Índice de la lista de clientes
+            
+        """
+        
+        for indice,cliente in enumerate(self.lista_clientes):
+                
+            if cliente.nombre==nombre and cliente.apellidos==apellidos:
+            
+                return cliente,True,indice
+                
+        return None,False,None
+                    
         
     def validar_cliente(self):
+        
+        """
+        Summary:
+            Solicita los datos de nombre y apellidos del cliente y los valida
+            
+        Args:
+            
+        Returns:
+            object Cliente:objeto de la clase Cliente
+            Bool:Resultado de la búsqueda
+            Int: Índice de la lista de clientes
+            
+        """
         
         if len(self.lista_clientes)>0:
             nombre=input("Introduce el nombre del cliente: ")
             apellidos=input("Introduce los apellidos del cliente: ")
+            return self.buscar_cliente(nombre,apellidos)
               
-            for indice,cliente in enumerate(self.lista_clientes,1):
-                
-                    if cliente.nombre==nombre and cliente.apellidos==apellidos:
-                        return cliente,True
-                    
-                    if indice==len(self.lista_clientes):
-                        print("Error: El cliente no existe")
-                        return None,False
         else:
-            print("Error no hay clientes registrados")
-            return False
+            
+            return None,False,None
 
     def registrar_cliente(self,cliente):
         
-        self.cliente=cliente
+        """
+        summary:
+            Añade el cliente a la lista de clientes
+    
+        Args:
+            object cliente:objeto de la clase Cliente
+
+        Returns:
+            Bool: True si ha podido registrar al cliente (añadirlo a la lista de clientes). False en caso contrario
+        """
         
         if len(self.lista_clientes)==0:
-            self.lista_clientes.append(self.cliente)
+        
+            self.lista_clientes.append(cliente)
             print("Cliente registrado correctamente")
             return True
         
-        for c in self.lista_clientes:
-            if c.nombre==self.cliente.nombre and c.apellidos==self.cliente.apellidos:
-                print("Error: el cliente ya existe")
-                return False     
-            
-        self.lista_clientes.append(self.cliente)
+        if self.buscar_cliente(cliente.nombre,cliente.apellidos)[1]:
+        
+            print("Error: el cliente ya existe")
+            return False     
+        
+        self.lista_clientes.append(cliente)
         print("Cliente registrado correctamente")
         return True
+    
+    def eliminar_cliente(self):
+        
+        """
+        Summary:
+            
+            Elimina un cliente de la lista de clientes   
+            
+        Args:
+            
+        Returns:
+            Bool: Resultado de la eliminación
+            
+        """
+        
+        Null,resultado,indice=self.validar_cliente()
+        
+        if resultado:
+            del self.lista_clientes[indice]
+            print("Cliente eliminado correctamente")
+            return True
+            
+        else:
+            print("Error: El cliente no existe")
+            return False
+        
         
     def listar_clientes(self):
+        
+        """
+        Summary:
+            
+            Lista los clientes almacenados en la lista de clientes
+            
+        Args:
+            
+        Returns:
+            
+            
+        """
         if len(self.lista_clientes)>0:
             for cliente in self.lista_clientes:
                 print(cliente)
@@ -87,6 +184,19 @@ class Clinica:
             print("Error no hay clientes registrados")
             
     def registrar_visita(self,cliente,mascota):
+        
+        """
+        Summary:
+            
+            Registra la visita del cliente y la mascota. Genera un string que luego se podrá guardar en el fichero de historico de visita txt
+            
+        Args:
+            object cliente:objeto de la clase Cliente
+            object mascota:objeto de la clase Cliente
+            
+        Returns:
+            
+        """
         
         self.cliente=cliente
         self.mascota=mascota
@@ -196,7 +306,7 @@ class Ejecutable:
         
         miClinica=Clinica("Mis peluditos")
         
-        lista_menu=["Registrar cliente","Agregar mascota a cliente","Dar de baja mascota a cliente","Listar clientes","Registrar visita","Imprimir historial visitas"]
+        lista_menu=["Registrar cliente","Eliminar cliente","Agregar mascota a cliente","Dar de baja mascota a cliente","Listar clientes","Registrar visita","Imprimir historial visitas"]
         
         salir=False
     
@@ -210,55 +320,78 @@ class Ejecutable:
                 apellidos=input("Introduce los apellidos del cliente: ")
                 miClinica.registrar_cliente(Cliente(nombre,apellidos))
                 input("Presiona Enter para continuar...")
-            
-            
-            elif opcion_elegida==2: #Agregar mascota a cliente
                 
-                cliente,resultado=miClinica.validar_cliente()
+            elif opcion_elegida == 2: #Eliminar cliente
+                
+                miClinica.eliminar_cliente()
+                input("Presiona Enter para continuar...")
+            
+            elif opcion_elegida==3: #Agregar mascota a cliente
+                
+                cliente,resultado,Null=miClinica.validar_cliente()
                 
                 if resultado:
 
                     cliente.agregar_mascota_cliente(Mascota(self,self).set_mascota())
+                
+                else:
+                    
+                    print("Error: El cliente no existe")
                                         
                 input("Presiona Enter para continuar...")
             
-            elif opcion_elegida==3: #Dar de baja mascota a cliente
+            elif opcion_elegida==4: #Dar de baja mascota a cliente
                 
-                cliente,resultado=miClinica.validar_cliente()
+                cliente,resultado,Null=miClinica.validar_cliente()
                 
                 if resultado:
                     
                     cliente.eliminar_mascota_cliente(Mascota(self,self).set_mascota())
+                    
+                else:
+                    
+                    print("Error: El cliente no existe")
                  
                 input("Presiona Enter para continuar...")
                 
-            elif opcion_elegida==4: #Listar clientes
+            elif opcion_elegida==5: #Listar clientes
                 
                 miClinica.listar_clientes()
                 input("Presiona Enter para continuar...")
             
             
-            elif opcion_elegida==5: # Registrar visita
+            elif opcion_elegida==6: # Registrar visita
                 
-                cliente,resultado=miClinica.validar_cliente()
+                cliente,resultado,Null=miClinica.validar_cliente()
                 
                 if resultado:
                  
                     miClinica.registrar_visita(cliente,Mascota(self,self).set_mascota())
                     
+                else:
+                    
+                    print("Error: El cliente no existe")
+                    
                 input("Presiona Enter para continuar...")
                 
                 
-            elif opcion_elegida==6: # Imprimir historial visitas
+            elif opcion_elegida==7: # Imprimir historial visitas
                 
-                cliente,resultado=miClinica.validar_cliente()
+                cliente,resultado,Null=miClinica.validar_cliente()
                 
                 if resultado:
+                    
+                    if cliente.historial_visitas:
         
-                    with open(f'{cliente.nombre}_{cliente.apellidos}_historial.txt', 'w', encoding='utf-8') as fichero:
-                        for v in cliente.historial_visitas:
-                            fichero.write(v)
-                    print(f"Se ha generado correctamente el fichero: {cliente.nombre}_{cliente.apellidos}_historial.txt")
+                        with open(f'{cliente.nombre}_{cliente.apellidos}_historial.txt', 'w', encoding='utf-8') as fichero:
+                            for v in cliente.historial_visitas:
+                                fichero.write(v)
+                        print(f"Se ha generado correctamente el fichero: {cliente.nombre}_{cliente.apellidos}_historial.txt")
+                    else:
+                        print("Error: No hay visitas registradas para este cliente")
+                else:
+                    
+                    print("Error: El cliente no existe")
     
                 input("Presiona Enter para continuar...")
                 
@@ -268,9 +401,7 @@ class Ejecutable:
 ###################################################################
 
 Ejecutable()
-#MEJORAS:
-#Añadir la opción de dar de baja un cliente
-#Documentar
+
 
 
     
