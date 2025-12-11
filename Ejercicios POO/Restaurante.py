@@ -45,21 +45,23 @@ class Pedido:
     
     def __init__(self):
         
+        self.numero=0
         self.lista_items=[]
-        self.estado_pedido="en preparación"
+        self.estado="en preparacion" #los estados pueden ser "en preparacion","servido"
         
         
     def agregar_item(self,item):
         
-        #comprobar si el item está en la lista, si está sumamos uno a la cantadidad actual, sino lo añadimos
+        self.lista_items.append(item)
+        # #comprobar si el item está en la lista, si está sumamos uno a la cantadidad actual, sino lo añadimos
         
-        if item in self.lista_items:
-            item.cantidad+=1
+        # if item in self.lista_items:
+        #     item.cantidad+=1
             
-        else:           
-            self.lista_items.append(item)
+        # else:           
+        #     self.lista_items.append(item)
         
-        print("Item añadido correntamente")
+        # print("Item añadido correntamente")
     
     def remover_item(self,item):
         
@@ -90,9 +92,9 @@ class Pedido:
             
     def actualizar_estado(self,nuevo_estado):
         
-        if self.estado_pedido!=nuevo_estado:
+        if self.estado!=nuevo_estado:
             
-            self.estado_pedido=nuevo_estado
+            self.estado=nuevo_estado
             
             return True
        
@@ -102,7 +104,7 @@ class Pedido:
         
         cadena="\n".join([str(vars(item)) for item in self.lista_items])
     
-        return f"Lista de platos:\n\n{cadena}\n\nEstado del pedido: {self.estado_pedido}"
+        return f"Lista de platos:\n\n{cadena}\n\nEstado del pedido: {self.estado}"
     
 
 class Carta:
@@ -119,25 +121,29 @@ class Carta:
         
         if item==None:
             self.lista_items.append(ItemMenu(ID,nombre,descripcion,precio,1))
+            print(f"El plato con ID:{ID} {nombre} {descripcion} precio: {precio}€ se ha añadido correctamente a la carta")
             return True
         
         print("Error: Ya existe un plato igual en el menu")
         return False
       
-            
     
     def remover_item(self,ID):
         
-        for i,id in enumerate(self.lista_items):
+        for i,item in enumerate(self.lista_items):
             
-            if id==ID:
+            if item.ID==ID:
             
                 del self.lista_items[i]
-                print(f"el item {id} se ha eliminado correctamente del menu")
+                print(f"el item {ID} se ha eliminado correctamente del menu")
                 return True
         
         print("Error:El plato no se encuentra en el menu")
         return False
+    
+    def buscar_item(self,ID):
+        
+        return next((i for i in self.lista_items if i.ID==ID),None)
         
                 
     def mostrar(self):
@@ -179,7 +185,7 @@ class Cliente:
         for item in list_of_items:
             self.pedido_actual.agregar_item(item)
         
-        self.pedido_actual.estado_pedido="servido"
+        self.pedido_actual.estado="servido"
     
     def solicitar_cuenta(self):
         return self.pedido_actual.calcular_total()
@@ -230,43 +236,75 @@ class Restaurante:
         mesa=next((m for m in self.lista_mesas if m.numero==numero),None)
         
         if mesa!=None:
+        
             mesa.liberar(numero)
-            print(f"La mesa {numero} liberada correctamente")
+        
             return True
         
-        print("Error: No ha sido posible liberar la mesa")
         return False
     
-    def mostrar_mesas_disponibles(self):
+    def asignar_mesa(self,numero):
         
-        for mesa in self.lista_mesas:
-            print(mesa)
-
-    def mostrar_clientes(self):
-     
-        for cliente in self.lista_clientes:
-            print(cliente)
-     
-    
-    def reservar_mesa(self,cliente,numero_mesa,capacidad):
-        
-        #comprobamos si la mesa cumple las condiciones para que se pueda reservar: 
-        # 1. que el numero esté en la lista de mesas del restaurante
-        # 2. que esté libre
-        # 3. que tenga la capacidad correcta
-        
-        mesa=next((mesa for mesa in self.lista_mesas if mesa.numero==numero_mesa and mesa.estado=="libre" and mesa.capacidad<=capacidad),None)
+        mesa=next((m for m in self.lista_mesas if m.numero==numero),None)
         
         if mesa!=None:
-            mesa.estado="ocupada"
-            cliente.asignar_mesa(numero_mesa)
-            self.lista_clientes.append(cliente)
+        
+            mesa.reservar(numero)
+            
             return True
         
-        print(f"Error: La mesa {numero_mesa} no está disponible")
         return False
-           
         
+    
+    def reservar_mesa(self,cliente,capacidad):
+        
+        #comprobamos si el cliente no está en la lista de clientes, en ese caso
+        #buscamos la mesa en la lista de mesas del restaurante la que esté libre
+        #y tenga la capacidad adecuada (mayor o igual a la pasada como parámetro)
+        
+        if next((c for c in self.lista_clientes if c.nombre==cliente.nombre),None)==None:
+        
+            for mesa in self.lista_mesas:
+                
+                if mesa.capacidad==capacidad and mesa.estado=="libre":
+                    
+                    cliente.asignar_mesa(mesa.numero)
+                    self.asignar_mesa(mesa.numero)
+                    self.lista_clientes.append(cliente)
+                    print(f"Reservada realizada correctamente.\nSe ha asignado a {cliente.nombre} la mesa {mesa.numero} que disfrutes de la comida")
+                    return True
+            
+            print("Error: No hay mesas disponibles")
+            return False
+        
+        else:
+            print(f"Error: el cliente ya tiene una mesa reservada en este restaurante")
+            return False
+    
+    def cancelar_reserva(self,cliente):
+        
+        #Cancelar reserva (sólo se podrá cancelar si no se ha hecho un pedido)
+        #buscamos al cliente, su mesa asignada y comprobamos el estado del pedido_actual
+        #eliminamos al cliente de la lista y liberamos la mesa
+        
+        miCliente=next((c for c in self.lista_clientes if c.nombre==cliente.nombre),None)
+        
+        if miCliente!=None and miCliente.pedido_actual.estado!="servido":
+            
+            mesa=next((m for m in self.lista_mesas if m.numero==miCliente.mesa_asignada),None)
+            self.liberar_mesas(mesa.numero)
+            self.lista_clientes.remove(miCliente)
+            print(f"Se ha cancelado correctamente la reserva de {miCliente.nombre} y se ha liberado la mesa {mesa.numero}")
+            return True
+        
+        print("Error: No ha sido posible cancelar la reserva. No existe este cliente")
+        return False
+    
+    def buscar_cliente(self,nombre):
+        
+        return next((c for c in self.lista_clientes if c.nombre==nombre),None)
+            
+                    
     def gestionar_pedido(self,cliente,items):
         
         if cliente in self.lista_clientes:
@@ -289,17 +327,27 @@ class Restaurante:
         print("Error: No ha sido posible mostrar la cuenta")
         return False
     
+    def mostrar_mesas_disponibles(self):
+        
+        for mesa in self.lista_mesas:
+            print(mesa)
+
+    def mostrar_clientes(self):
+     
+        for cliente in self.lista_clientes:
+            print(cliente)
 
 class Ejecutable:
     
     def __init__(self):
         
         miRestaurante=Restaurante("Pachuparselosdedos")
+        miCarta=Carta()
         
         lista_menu=["Mostrar mesas","Actualizar mesas",
                     "Mostrar carta","Actualizar la carta",
                     "Mostrar reservas","Actualizar reserva",
-                    "Mostrar pedidos","Hacer pedido","Pagar"]
+                    "Hacer pedido","Pagar"]
         
         salir=False
     
@@ -350,24 +398,152 @@ class Ejecutable:
                 input("Presiona Enter para continuar...")
                  
             elif opcion_elegida == 3: #Mostrar carta
-                 input("Presiona Enter para continuar...")
+                
+                miCarta.mostrar()                
+                
+                input("Presiona Enter para continuar...")
                  
             elif opcion_elegida == 4: #Actualizar carta
-                 input("Presiona Enter para continuar...")
+                
+                while True:
+                    try:
+                        opcion=int(input(f"1. Añadir plato\n2. Eliminar plato\n3. Salir\n"))
+                        if opcion>=1 and opcion<=3:
+                            break
+                        input("Opción incorrecta")
+                    except:
+                        print("Opción incorrecta")
+                        
+                if opcion==1:
+                    while True:
+                        try:
+                            ID=int(input(f"Introduce el ID del plato: "))
+                            nombre=input(f"Introduce el nombre del plato: ")
+                            descripcion=input(f"Introduce la descripción del plato: ")
+                            precio=int(input("Introduce el precio del plato: "))
+                            miCarta.agregar_item(ID,nombre,descripcion,precio)
+                            break
+                        except:
+                            print("Opción incorrecta")
+        
+            
+                elif opcion==2:
+                    while True:
+                        try:
+                            ID=int(input(f"Introduce el ID del plato: "))
+                            miCarta.remover_item(ID)
+                            break
+                        except:
+                            print("Opción incorrecta")
+                    
+                input("Presiona Enter para continuar...")
                  
             elif opcion_elegida == 5: #Mostrar reservas
-                 input("Presiona Enter para continuar...")
+                
+                miRestaurante.mostrar_clientes()
+                
+                input("Presiona Enter para continuar...")
                  
             elif opcion_elegida == 6: #Actualizar reservas
-                 input("Presiona Enter para continuar...")
+                
+                while True:
+                    try:
+                        opcion=int(input(f"1. Añadir reserva\n2. Cancelar reserva\n3. Salir\n"))
+                        if opcion>=1 and opcion<=3:
+                            break
+                        input("Opción incorrecta")
+                    except:
+                        print("Opción incorrecta")
+                        
+                if opcion==1: #Añadir reserva
+                    while True:
+                        try:
+                            nombre=input(f"Introduce nombre del cliente: ")
+                            capacidad=int(input(f"Introduce el número de comensales: "))
+                            miRestaurante.reservar_mesa(Cliente(nombre),capacidad)            
+                            break
+                        except:
+                            print("Opción incorrecta")
+                    
+                elif opcion==2: #Cancelar reserva
+                    while True:
+                        try:
+                            nombre=input(f"Introduce nombre del cliente: ")
+                            miRestaurante.cancelar_reserva(Cliente(nombre))
+                            break
+                        except:
+                            print("Opción incorrecta")
+                
+                input("Presiona Enter para continuar...")
                  
-            elif opcion_elegida == 7: #Mostrar pedidos
-                 input("Presiona Enter para continuar...")
                  
-            elif opcion_elegida == 8: #Hacer pedido
-                 input("Presiona Enter para continuar...")
+            elif opcion_elegida == 7: #Hacer pedido
+                
+                lista_items=[]
+                nombre=input("Introduce el nombre del cliente: ")
+                miCliente=miRestaurante.buscar_cliente(nombre)
+                
+                while True:
+                    
+                    item=int(input("Introduce el ID del plato: "))
+                    cantidad=int(input("Introduce la cantidad: "))
+                    
+                    while True:
+                        respuesta=input("Pulsa C para Continuar con el pedido o S para Salir y enviar el pedido: ").lower()
+                        if respuesta!="s" and respuesta!="c":
+                            print("Opción incorrecta")
+                        else:
+                            break
+                    
+                    miItem=miCarta.buscar_item(item)
+                    
+                    if respuesta=="c":
+                            
+                        if miItem in lista_items:
+                            lista_items.remove(miItem)
+                            miItem.cantidad+=cantidad
+                            lista_items.append(miItem)
+                        else:    
+                            miItem.cantidad=cantidad
+                            lista_items.append(miItem)
+                        
+                    else:
+                        miItem=miCarta.buscar_item(item)
+                        
+                        if miItem in lista_items:
+                            lista_items.remove(miItem)
+                            miItem.cantidad+=cantidad
+                            lista_items.append(miItem)
+                        else:    
+                            miItem.cantidad=cantidad
+                            lista_items.append(miItem)
+                                
+                        miRestaurante.gestionar_pedido(miCliente,lista_items)
+                        break
+                        
+                """
+                BUGS:
+                - No actualiza bien las cantidades
+                - Si haces varios pedidos del mismo cliente no muestra correctamente la info
+                - Control de excepciones en la entrada de datos tipo int
+            
+                NUEVA IMPLEMENTACION:
+                -Añadir un número a la clase Pedido de manera que un mismo cliente pueda realizar varios pedidos y no se machaque la información
+                
+            
+                """
+                    
+                    
+                    
+                
+                
+                
+                
+                
+                
+                input("Presiona Enter para continuar...")
                  
-            elif opcion_elegida == 9: #Pagar
+            elif opcion_elegida == 8: #Pagar
                  input("Presiona Enter para continuar...")
                  
             else:
