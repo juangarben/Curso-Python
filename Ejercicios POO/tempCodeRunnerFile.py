@@ -1,1 +1,2 @@
-            elif opcion_elegida == 8: #Pagar
+miHabitacion=Habitacion(1,"idsndividual")
+# print(miHabitacion)
