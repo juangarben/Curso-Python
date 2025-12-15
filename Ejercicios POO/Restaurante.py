@@ -302,7 +302,9 @@ class Restaurante:
         
         self.mostrar_cuenta(miCliente)
         self.liberar_mesas(mesa.numero)
+        print(f"Gracias por su visita {miCliente.nombre}")
         self.lista_clientes.remove(miCliente)
+       
         
         
     def buscar_cliente(self,nombre):
@@ -488,9 +490,14 @@ class Ejecutable:
                 miCliente=miRestaurante.buscar_cliente(nombre)
                 
                 while True:
-                    
-                    ID=int(input("Introduce el ID del plato: "))
-                    cantidad=int(input("Introduce la cantidad: "))
+                    while True:
+                        try:
+                            ID=int(input("Introduce el ID del plato: "))
+                            cantidad=int(input("Introduce la cantidad: "))
+                            break
+                        except:
+                            print("Error: Datos incorrectos, debes de introducir un número entero")
+                            
                     
                     while True:
                         respuesta=input("Pulsa C para Continuar con el pedido o S para Salir y enviar el pedido: ").lower()
@@ -505,9 +512,12 @@ class Ejecutable:
                     item=next((item for item in lista_items if item.ID==ID),None)
                     
                     if item==None:
-                        miItem=ItemMenu(Item.ID,Item.nombre,Item.descripcion,Item.precio,Item.cantidad)
-                        miItem.cantidad=cantidad
-                        lista_items.append(miItem)     
+                        try:
+                            miItem=ItemMenu(Item.ID,Item.nombre,Item.descripcion,Item.precio,Item.cantidad)
+                            miItem.cantidad=cantidad
+                            lista_items.append(miItem)     
+                        except:
+                            print("Error: No ha sido posible realizar el pedido. Inténtalo de nuevo más tarde")
                     else:
                         
                         lista_items.remove(item)
@@ -535,18 +545,8 @@ class Ejecutable:
             else:
                 salir=True
                 
-
-"""
-    BUGS:
     
-    - Control de excepciones, especialmente en la entrada de datos tipo int
-
-    NUEVA IMPLEMENTACION:
-  
-
-"""
-    
-################################
+####################################################################################
 
 Ejecutable()
 
