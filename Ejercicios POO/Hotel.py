@@ -17,7 +17,7 @@ class Cliente:
     
         
     def __str__(self):
-        return f"\nNombre del cliente: {self.nombre}\tNº hab:{self.numero_habitacion}\t{self.pension}\tfecha_entrada:{self.fecha_entrada}\tfecha salida:{self.fecha_salida}\n"
+        return f"\nCliente: {self.nombre:<10}\tNº hab:{self.numero_habitacion}\t{self.pension}\tfecha_entrada:{self.fecha_entrada}\tfecha salida:{self.fecha_salida}\n"
     
 class Habitacion:
     def __init__(self,numero,tipo,precio):
@@ -196,12 +196,3 @@ miHotel.resevar_habitacion("ester","doble")
 miHotel.listar_habitaciones()
 miHotel.listar_clientes()
 
-# lista_clientes=[Cliente("juan"),Cliente("perico"),Cliente("andres")]
-# resultado=buscar_cliente(lista_clientes,"numero_habitacion",0)
-# print(f"{resultado[0]}-{resultado[1]}")
-
-
-
-
-# miHabitacion=Habitacion(1,"idsndividual")
-# print(miHabitacion)
