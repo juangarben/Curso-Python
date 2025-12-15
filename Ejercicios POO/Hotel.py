@@ -4,6 +4,21 @@ from Modulo_Menu import Menu
 from datetime import datetime,date
 import random,os
 
+
+class Cliente:
+    
+    def __init__(self,nombre):
+        self.nombre=nombre
+        self.numero_habitacion=0
+        self.pension="AD" #puede ser AD,MP,PC
+        self.fecha_entrada=""
+        self.fecha_salida=""
+    
+    
+        
+    def __str__(self):
+        return f"\nNombre del cliente: {self.nombre}\tNº hab:{self.numero_habitacion}\t{self.pension}\tfecha_entrada:{self.fecha_entrada}\tfecha salida:{self.fecha_salida}\n"
+    
 class Habitacion:
     def __init__(self,numero,tipo,precio):
         
@@ -23,21 +38,9 @@ class Habitacion:
         return False
     
     def __str__(self):
-        return f"\nHabitación {self.tipo} nº {self.numero}\n"
+        return f"Habitación {self.tipo}\tnº {self.numero}\t{self.precio}€/noche\t{self.estado}\n"
 
-class Cliente:
-    
-    def __init__(self,nombre):
-        self.nombre=nombre
-        self.numero_habitacion=0
-        self.pension="AD" #puede ser AD,MP,PC
-        self.fecha_entrada=""
-        self.fecha_salida=""
-    
-    
-        
-    def __str__(self):
-        return f"\nNombre del cliente: {self.nombre}\tNº hab:{self.numero_habitacion}\t{self.pension}\tfecha_entrada:{self.fecha_entrada}\tfecha salida:{self.fecha_salida}\n"
+
 
 class Hotel:
     def __init__(self,nombre):
@@ -57,22 +60,32 @@ class Hotel:
     
     def resevar_habitacion(self,nombre,tipo_hab):
         
-        if not buscar_cliente(self.lista_clientes,"nombre",nombre):
-        #if not next((c for c in self.lista_clientes if c.nombre==nombre),None):
-            self.lista_clientes.append(Cliente(nombre))
-            #asignar habitación
-            print("Cliente registrado correctamente")
+        cliente=buscar_objeto(self.lista_clientes,"nombre",nombre)[0]
+        habitacion=self.asignar_habitacion(tipo_hab)
+        if habitacion!=None:
+            if cliente==None:
+                
+                miCliente=Cliente(nombre)
+                miCliente.numero_habitacion=habitacion.numero
+                self.lista_clientes.append(miCliente)
+                
+            else:
+                print("Error cliente ya registrado en el hotel")
         else:
-            print("Error: El cliente ya está registrado")
+            print("Error no hay habitaciones disponibles")
+   
             
     def cancelar_reserva(self):
         pass
     
     def asignar_habitacion(self,tipo_hab):
         #el método devuelve la habitación asignada
-        habitacion=next(h for h in self.lista_habitaciones if h.tipo==tipo_hab and h.estado=="libre")
+        habitacion=next((h for h in self.lista_habitaciones if h.tipo==tipo_hab and h.estado=="libre"),None)
         if habitacion !=None:
+            habitacion.estado="reservada"
             print(f"La habitación nº{habitacion.numero} ha sido reservada")
+            return habitacion
+        return None
             
         
     def checkin(self,nombre):
@@ -95,7 +108,8 @@ class Hotel:
     
     def liberar_habitacion(self,numero):
         
-        habitacion=next((h for h in self.lista_habitaciones if h.numero==numero),None)
+        habitacion=buscar_objeto(self.lista_habitaciones,"numero",numero)[0]
+        #habitacion=next((h for h in self.lista_habitaciones if h.numero==numero),None)
         if habitacion!=None:
             habitacion.estado="libre"
             return True
@@ -103,16 +117,18 @@ class Hotel:
             
     def agregar_hab(self,habitacion):
         
-        if not next((h for h in self.lista_habitaciones if h.numero==habitacion.numero),None):
+        if not buscar_objeto(self.lista_habitaciones,"numero",habitacion.numero)[1]:
+        #if not next((h for h in self.lista_habitaciones if h.numero==habitacion.numero),None):
             self.lista_habitaciones.append(habitacion)
             return True
         
-        print("Error habitación existente")
+        print("Error no se ha podido añadir la habitación al hotel")
         return False
     
     def eliminar_hab(self,habitacion):
         
-        if next((h for h in self.lista_habitaciones if h.numero==habitacion.numero),None):
+        if buscar_objeto(self.lista_habitaciones,"numero",habitacion.numero)[1]:
+        #if next((h for h in self.lista_habitaciones if h.numero==habitacion.numero),None):
             self.lista_habitaciones.remove(habitacion)
             return True
         
@@ -132,7 +148,7 @@ class Ejecutable:
 
 ####################################################
 
-def buscar_cliente(lista,dato,valor):
+def buscar_objeto(lista,dato,valor):
     
     try:
         
@@ -150,7 +166,35 @@ def buscar_cliente(lista,dato,valor):
     return None,False
     
         
-    
+#########################################################
+
+
+miHotel=Hotel("Juanito's empire")
+miHotel.agregar_hab(Habitacion(1,"doble",50))
+miHotel.agregar_hab(Habitacion(2,"suite",100))
+miHotel.agregar_hab(Habitacion(3,"individual",30))
+miHotel.agregar_hab(Habitacion(4,"doble",50))
+miHotel.agregar_hab(Habitacion(5,"suite",100))
+miHotel.listar_habitaciones()
+
+miHotel.resevar_habitacion("juan","suite")
+miHotel.listar_habitaciones()
+
+miHotel.resevar_habitacion("perico","doble")
+miHotel.listar_habitaciones()
+
+miHotel.resevar_habitacion("andres","individual")
+miHotel.listar_habitaciones()
+
+miHotel.resevar_habitacion("maria","suite")
+miHotel.listar_habitaciones()
+
+miHotel.resevar_habitacion("eva","doble")
+miHotel.listar_habitaciones()
+
+miHotel.resevar_habitacion("ester","doble")
+miHotel.listar_habitaciones()
+miHotel.listar_clientes()
 
 # lista_clientes=[Cliente("juan"),Cliente("perico"),Cliente("andres")]
 # resultado=buscar_cliente(lista_clientes,"numero_habitacion",0)
