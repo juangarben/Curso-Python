@@ -2,7 +2,7 @@
 """
 from Modulo_Menu import Menu
 from datetime import datetime,date
-import random,os
+import random,os,math
 
 
 class Cliente:
@@ -13,8 +13,6 @@ class Cliente:
         self.pension="AD" #puede ser AD,MP,PC
         self.fecha_entrada=""
         self.fecha_salida=""
-    
-    
         
     def __str__(self):
         return f"\nCliente: {self.nombre:<10}\tNº hab:{self.numero_habitacion}\t{self.pension}\tfecha_entrada:{self.fecha_entrada}\tfecha salida:{self.fecha_salida}\n"
@@ -41,7 +39,6 @@ class Habitacion:
         return f"Habitación {self.tipo}\tnº {self.numero}\t{self.precio}€/noche\t{self.estado}\n"
 
 
-
 class Hotel:
     def __init__(self,nombre):
         
@@ -56,7 +53,28 @@ class Hotel:
     def listar_clientes(self):
         for cliente in self.lista_clientes:
             print(cliente)
-            
+    
+    def agregar_hab(self,habitacion):
+        
+        if not buscar_objeto(self.lista_habitaciones,"numero",habitacion.numero)[1]:
+        #if not next((h for h in self.lista_habitaciones if h.numero==habitacion.numero),None):
+            self.lista_habitaciones.append(habitacion)
+            return True
+        
+        print("Error no se ha podido añadir la habitación al hotel")
+        return False
+    
+    def eliminar_hab(self,numero):
+        
+        habitacion=buscar_objeto(self.lista_habitaciones,"numero",numero)
+        if habitacion[1]:
+        #if next((h for h in self.lista_habitaciones if h.numero==habitacion.numero),None):
+            self.lista_habitaciones.remove(habitacion[0])
+            return True
+        
+        print("Error la habitación no existe")
+        return False
+        
     
     def resevar_habitacion(self,nombre,tipo_hab):
         
@@ -75,8 +93,19 @@ class Hotel:
             print("Error no hay habitaciones disponibles")
    
             
-    def cancelar_reserva(self):
-        pass
+    def cancelar_reserva(self,nombre):
+        
+        cliente=buscar_objeto(self.lista_clientes,"nombre",nombre)[0]
+        
+        if self.liberar_habitacion(cliente.numero_habitacion):
+        
+            self.lista_clientes.remove(cliente)
+            print(f"La reserva a nombre de {cliente.nombre} se ha cancelado correctamente")
+            return True
+        
+        print("Error: No ha sido posible cancelar la reserva")
+        return False
+        
     
     def asignar_habitacion(self,tipo_hab):
         #el método devuelve la habitación asignada
@@ -86,25 +115,6 @@ class Hotel:
             print(f"La habitación nº{habitacion.numero} ha sido reservada")
             return habitacion
         return None
-            
-        
-    def checkin(self,nombre):
-        
-        #registra la fecha de entrada y el tipo de pensión
-        while True:
-            try:
-                fecha_entrada=input("Introduce la fecha de entrada (d-m-a): ")
-                break
-            except:
-                print("Formato de fecha incorrecto. Inténtalo de nuevo")
-                
-        fecha_entrada=datetime.strptime(fecha_entrada, '%d-%m-%Y')
-        pass
-    
-    def checkout(self,nombre):
-        #registra la fecha de salida y el tipo de pensión
-        #Genera la factura
-        pass
     
     def liberar_habitacion(self,numero):
         
@@ -114,35 +124,102 @@ class Hotel:
             habitacion.estado="libre"
             return True
         return False
-            
-    def agregar_hab(self,habitacion):
         
-        if not buscar_objeto(self.lista_habitaciones,"numero",habitacion.numero)[1]:
-        #if not next((h for h in self.lista_habitaciones if h.numero==habitacion.numero),None):
-            self.lista_habitaciones.append(habitacion)
-            return True
+    def checkin(self,nombre):
         
-        print("Error no se ha podido añadir la habitación al hotel")
-        return False
+        #registra la fecha de entrada y el tipo de pensión
+        while True:
+            try:
+                fecha_entrada=input("Introduce la fecha de entrada (d-m-a): ")
+                fecha_entrada=datetime.strptime(fecha_entrada, '%d-%m-%Y')
+                pension=input("Introduce el tipo de pensión (AD,MP,PC): ")
+                
+                if pension.lower()=="ad" or pension.lower()=="mp" or pension.lower()=="pc":
+                    
+                    cliente=buscar_objeto(self.lista_clientes,"nombre",nombre)
+                
+                    if cliente[1]:
+                        cliente[0].pension=pension
+                        cliente[0].fecha_entrada=fecha_entrada
+                        print(f"Checkin a nombre de {cliente[0].nombre} realizado correctamente")
+                        return True
+                    else:
+                        print("Error: No se puede hacer el checkin porque el cliente no tiene reservada la habitacion")
+                        return False
+                    
+                else:
+                    print(f"Error: Dato de entrada incorrecto. Inténtalo de nuevo...")
+                
+            except:
+                print("Formato de fecha incorrecto. Inténtalo de nuevo")
+                
+                
     
-    def eliminar_hab(self,habitacion):
+    def checkout(self,nombre):
+        #registra la fecha de salida 
+        #Si el checkout se ha realizado correctamente se genera la factura
         
-        if buscar_objeto(self.lista_habitaciones,"numero",habitacion.numero)[1]:
-        #if next((h for h in self.lista_habitaciones if h.numero==habitacion.numero),None):
-            self.lista_habitaciones.remove(habitacion)
-            return True
+           while True:
+            try:
+                fecha_salida=input("Introduce la fecha de salida (d-m-a): ")
+                fecha_salida=datetime.strptime(fecha_salida, '%d-%m-%Y')
+                
+                cliente=buscar_objeto(self.lista_clientes,"nombre",nombre)
+                
+                if cliente[1]:
+                    
+                    if fecha_salida <= cliente[0].fecha_entrada:
+                        print("Error: La fecha de salida debe ser posterior a la de entrada")
+                        return False
+                    
+                    else:
+                
+                        cliente[0].fecha_salida=fecha_salida
+                        noches = (cliente[0].fecha_salida - cliente[0].fecha_entrada).days
+                        print(f"Alojamiento de {noches} noches")
+                        factura=self.Facturar(cliente[0].nombre,noches)
+                        print(f"Checkout a nombre de {cliente[0].nombre} realizado correctamente\nTotal factura={factura}€\n")
+                        return True
+                else:
+                    print("Error: No se puede hacer el checkout porque el cliente no tiene reservada la habitacion")
+                    return False
+                             
+            except:
+                print("Formato de fecha incorrecto. Inténtalo de nuevo")
         
-        print("Error la habitación no existe")
-        return False
-        
-            
-    def Facturar(self,cliente):
+                
+    def Facturar(self,nombre,noches):
         # Precio por hab/noche AD + 10%MP + 20%PC
         # Devuelve el importe de la factura
-        pass        
-    
         
-
+        cliente=buscar_objeto(self.lista_clientes,"nombre",nombre)
+        
+        if cliente[1]:
+            pension=cliente[0].pension.lower()
+            habitacion=buscar_objeto(self.lista_habitaciones,"numero",cliente[0].numero_habitacion)
+            
+            if habitacion[1]:
+                total=habitacion[0].precio*noches
+                if pension=="mp":
+                    total*=1.10
+                    total=round(total,3)
+                    return total
+                elif pension=="pc":
+                    total*=1.20
+                    total=round(total,3)
+                    return total
+                else:
+                    total=round(total,3)
+                    return total
+                    
+            else:
+                print("Error: Habitación no encontrada")
+                return 0
+        else:
+            print("Error: Cliente no encontrado")
+            return 0
+                
+    
 class Ejecutable:
     pass
 
@@ -176,23 +253,38 @@ miHotel.agregar_hab(Habitacion(3,"individual",30))
 miHotel.agregar_hab(Habitacion(4,"doble",50))
 miHotel.agregar_hab(Habitacion(5,"suite",100))
 miHotel.listar_habitaciones()
+# miHotel.eliminar_hab(6)
+# print("__________________")
+# miHotel.listar_habitaciones()
+
 
 miHotel.resevar_habitacion("juan","suite")
-miHotel.listar_habitaciones()
-
-miHotel.resevar_habitacion("perico","doble")
-miHotel.listar_habitaciones()
-
-miHotel.resevar_habitacion("andres","individual")
-miHotel.listar_habitaciones()
-
-miHotel.resevar_habitacion("maria","suite")
-miHotel.listar_habitaciones()
-
-miHotel.resevar_habitacion("eva","doble")
-miHotel.listar_habitaciones()
-
-miHotel.resevar_habitacion("ester","doble")
+miHotel.resevar_habitacion("pepe","doble")
 miHotel.listar_habitaciones()
 miHotel.listar_clientes()
+
+miHotel.cancelar_reserva("juan")
+miHotel.listar_habitaciones()
+print("__________________")
+miHotel.listar_clientes()
+
+
+# miHotel.checkin("juan")
+# miHotel.checkout("juan")
+
+# miHotel.resevar_habitacion("perico","doble")
+# miHotel.listar_habitaciones()
+
+# miHotel.resevar_habitacion("andres","individual")
+# miHotel.listar_habitaciones()
+
+# miHotel.resevar_habitacion("maria","suite")
+# miHotel.listar_habitaciones()
+
+# miHotel.resevar_habitacion("eva","doble")
+# miHotel.listar_habitaciones()
+
+# miHotel.resevar_habitacion("ester","doble")
+# miHotel.listar_habitaciones()
+# miHotel.listar_clientes()
 
