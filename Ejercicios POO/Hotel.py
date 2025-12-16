@@ -57,7 +57,7 @@ class Hotel:
     def agregar_hab(self,habitacion):
         
         if not buscar_objeto(self.lista_habitaciones,"numero",habitacion.numero)[1]:
-        #if not next((h for h in self.lista_habitaciones if h.numero==habitacion.numero),None):
+       
             self.lista_habitaciones.append(habitacion)
             return True
         
@@ -66,13 +66,15 @@ class Hotel:
     
     def eliminar_hab(self,numero):
         
-        habitacion=buscar_objeto(self.lista_habitaciones,"numero",numero)
-        if habitacion[1]:
-        #if next((h for h in self.lista_habitaciones if h.numero==habitacion.numero),None):
-            self.lista_habitaciones.remove(habitacion[0])
-            return True
-        
-        print("Error la habitación no existe")
+        try:
+            habitacion=buscar_objeto(self.lista_habitaciones,"numero",numero)[0]
+            if habitacion.estado!="reservada":
+                self.lista_habitaciones.remove(habitacion)
+                return True
+        except: 
+            pass
+            
+        print("Error: la habitación no existe o está reservada")
         return False
         
     
@@ -86,27 +88,33 @@ class Hotel:
                 miCliente=Cliente(nombre)
                 miCliente.numero_habitacion=habitacion.numero
                 self.lista_clientes.append(miCliente)
+                return True
                 
-            else:
-                print("Error cliente ya registrado en el hotel")
-        else:
-            print("Error no hay habitaciones disponibles")
-   
-            
-    def cancelar_reserva(self,nombre):
+            print("Error: cliente ya registrado en el hotel")
+            return False
         
-        cliente=buscar_objeto(self.lista_clientes,"nombre",nombre)[0]
-        
-        if self.liberar_habitacion(cliente.numero_habitacion):
-        
-            self.lista_clientes.remove(cliente)
-            print(f"La reserva a nombre de {cliente.nombre} se ha cancelado correctamente")
-            return True
-        
-        print("Error: No ha sido posible cancelar la reserva")
+        print("Error: no hay habitaciones disponibles")
         return False
+       
+    def cancelar_reserva(self,nombre):
+        #NOTA:No se puede cancelar la reserva si hay un checkin hecho
         
-    
+        try:
+            cliente=buscar_objeto(self.lista_clientes,"nombre",nombre)[0]
+            
+            if cliente.fecha_entrada=="":
+            
+                if self.liberar_habitacion(cliente.numero_habitacion):    
+                    self.lista_clientes.remove(cliente)
+                    print(f"La reserva a nombre de {cliente.nombre} se ha cancelado correctamente")
+                    return True
+            else:
+                print("Error: No se puede cancelar la reserva porque ya hay un check-in")
+        except:
+            
+            print("Error: No ha sido posible cancelar la reserva")
+            return False
+        
     def asignar_habitacion(self,tipo_hab):
         #el método devuelve la habitación asignada
         habitacion=next((h for h in self.lista_habitaciones if h.tipo==tipo_hab and h.estado=="libre"),None)
@@ -119,7 +127,7 @@ class Hotel:
     def liberar_habitacion(self,numero):
         
         habitacion=buscar_objeto(self.lista_habitaciones,"numero",numero)[0]
-        #habitacion=next((h for h in self.lista_habitaciones if h.numero==numero),None)
+       
         if habitacion!=None:
             habitacion.estado="libre"
             return True
@@ -129,30 +137,44 @@ class Hotel:
         
         #registra la fecha de entrada y el tipo de pensión
         while True:
-            try:
-                fecha_entrada=input("Introduce la fecha de entrada (d-m-a): ")
-                fecha_entrada=datetime.strptime(fecha_entrada, '%d-%m-%Y')
-                pension=input("Introduce el tipo de pensión (AD,MP,PC): ")
+            
+            cliente=buscar_objeto(self.lista_clientes,"nombre",nombre)
+            
+            if cliente[1]:
                 
-                if pension.lower()=="ad" or pension.lower()=="mp" or pension.lower()=="pc":
+                if cliente[0].fecha_entrada=="":
+                    while True:
+                        
+                        try:
+                            
+                            fecha_entrada=input("Introduce la fecha de entrada (d-m-a): ")
+                            fecha_entrada=datetime.strptime(fecha_entrada, '%d-%m-%Y')
+                            break
+                            
+                        except:
+                            print("Formato de fecha incorrecto. Inténtalo de nuevo")
                     
-                    cliente=buscar_objeto(self.lista_clientes,"nombre",nombre)
-                
-                    if cliente[1]:
-                        cliente[0].pension=pension
-                        cliente[0].fecha_entrada=fecha_entrada
-                        print(f"Checkin a nombre de {cliente[0].nombre} realizado correctamente")
-                        return True
-                    else:
-                        print("Error: No se puede hacer el checkin porque el cliente no tiene reservada la habitacion")
-                        return False
+                    pension=input("Introduce el tipo de pensión (AD,MP,PC): ")
                     
+                    while True:    
+                    
+                        if pension.lower()=="ad" or pension.lower()=="mp" or pension.lower()=="pc":
+                            
+                            cliente[0].pension=pension
+                            cliente[0].fecha_entrada=fecha_entrada
+                            print(f"Checkin a nombre de {cliente[0].nombre} realizado correctamente")
+                            return True
+                            
+                        else:
+                            print("Error: Tipo de pensión incorrecto. Inténtalo de nuevo")
+                            
                 else:
-                    print(f"Error: Dato de entrada incorrecto. Inténtalo de nuevo...")
-                
-            except:
-                print("Formato de fecha incorrecto. Inténtalo de nuevo")
-                
+                    print(f"Error: El cliente {nombre} ya tiene un check-in hecho ")
+                    return False
+            
+            else:
+                print(f"Error: El cliente {nombre} no tiene una habitación reservada")
+                return False
                 
     
     def checkout(self,nombre):
@@ -176,8 +198,11 @@ class Hotel:
                 
                         cliente[0].fecha_salida=fecha_salida
                         noches = (cliente[0].fecha_salida - cliente[0].fecha_entrada).days
+                    
                         print(f"Alojamiento de {noches} noches")
+                        self.liberar_habitacion(cliente[0].numero_habitacion)                        
                         factura=self.Facturar(cliente[0].nombre,noches)
+                        self.lista_clientes.remove(cliente[0])
                         print(f"Checkout a nombre de {cliente[0].nombre} realizado correctamente\nTotal factura={factura}€\n")
                         return True
                 else:
@@ -221,7 +246,150 @@ class Hotel:
                 
     
 class Ejecutable:
-    pass
+    #Contiene el menu de la app para su ejecución
+    def __init__(self):
+        
+        miHotel=Hotel("Juanito's empire")
+        
+        lista_menu=[
+                    "Listar habitaciones",
+                    "Actualizar habitaciones",
+                    "Listar clientes",
+                    "Actualizar reserva",
+                    "Actualizar check",
+                    ]
+        
+        salir=False
+    
+        while not salir:
+            os.system('cls')
+            opcion_elegida=Menu(f"HOTEL {miHotel.nombre}",lista_menu).crear_menu()
+        
+            if opcion_elegida == 1: #Listar habitaciones
+                
+                miHotel.listar_habitaciones()
+                input("Presiona Enter para continuar...")
+            
+            elif opcion_elegida == 2: #Actualizar habitaciones
+                while True:
+                    try:
+                        opcion=int(input(f"1. Añadir habitación\n2. Eliminar habitación\n3. Salir\n"))
+                        if opcion>=1 and opcion<=3:
+                            break
+                        input("Opción incorrecta")
+                    except:
+                        print("Opción incorrecta")
+                        
+                if opcion==1:
+                    
+                    while True:
+                        try:
+                            numero=int(input(f"Introduce el número de habitación: "))
+                            tipo=int(input(f"Introduce el número de habitación:\n1.individual\n2.doble\n3.suite\n"))
+                            
+                            if tipo==1:
+                                tipo_habitacion="individual"
+                            elif tipo==2:
+                                tipo_habitacion="doble"
+                            elif tipo==3:
+                                tipo_habitacion="suite"
+                                
+                            precio=float(input(f"Introduce el precio por noche: "))
+                            if miHotel.agregar_hab(Habitacion(numero,tipo_habitacion,precio)):
+                                print(f"La habitación nº {numero} se ha añadido correctamente")
+                           
+                            break
+                            
+                        except:
+                            print("Opción incorrecta")
+        
+            
+                elif opcion==2:
+                    while True:
+                        try:
+                            numero=int(input(f"Introduce el número de habitación: "))
+                            if miHotel.eliminar_hab(numero):
+                                print(f"La habitación nº {numero} se ha eliminado correctamente")
+                            else:
+                                print(f"Error: No ha sido posido eliminar la habitación {numero}")
+                            break
+                        except:
+                            print("Opción incorrecta")
+                    
+                input("Presiona Enter para continuar...")
+                 
+            elif opcion_elegida == 3: #Listar clientes
+                       
+                miHotel.listar_clientes()
+                
+                input("Presiona Enter para continuar...")
+                 
+            elif opcion_elegida == 4: #Actualizar reserva
+                
+                while True:
+                    try:
+                        opcion=int(input(f"1. Añadir reserva\n2. Cancelar reserva\n3. Salir\n"))
+                        if opcion>=1 and opcion<=3:
+                            break
+                        input("Opción incorrecta")
+                    except:
+                        print("Opción incorrecta")
+                        
+                if opcion==1:
+                    while True:
+                        try:
+                            
+                            nombre=input(f"Introduce el nombre del cliente: ")
+                            tipo=int(input(f"Introduce el número de habitación:\n1.individual\n2.doble\n3.suite\n"))
+                            
+                            if tipo==1:
+                                tipo_habitacion="individual"
+                            elif tipo==2:
+                                tipo_habitacion="doble"
+                            elif tipo==3:
+                                tipo_habitacion="suite"
+                                
+                            if miHotel.resevar_habitacion(nombre,tipo_habitacion):
+                                print(f"La reserva a nombre de {nombre} se ha realizado correctamente")
+                            
+                            break
+                        except:
+                            print("Opción incorrecta")
+        
+            
+                elif opcion==2:
+                    
+                    nombre=input(f"Introduce el nombre del cliente: ")
+                    miHotel.cancelar_reserva(nombre)
+                    
+                input("Presiona Enter para continuar...")
+                 
+            elif opcion_elegida == 5: #Actualizar check
+                
+                while True:
+                    try:
+                        opcion=int(input(f"1. Check-in\n2. Check-out\n3. Salir\n"))
+                        if opcion>=1 and opcion<=3:
+                            break
+                        input("Opción incorrecta")
+                    except:
+                        print("Opción incorrecta")
+                        
+                if opcion==1: #check-in
+                    
+                    nombre=input(f"Introduce nombre del cliente: ")
+                    miHotel.checkin(nombre)
+                        
+                    
+                elif opcion==2: #check-out
+                    nombre=input(f"Introduce nombre del cliente: ")
+                    miHotel.checkout(nombre)
+                    
+                input("Presiona Enter para continuar...")
+                                  
+            else:
+                salir=True
+    
 
 ####################################################
 
@@ -244,47 +412,11 @@ def buscar_objeto(lista,dato,valor):
     
         
 #########################################################
+Ejecutable()
 
-
-miHotel=Hotel("Juanito's empire")
-miHotel.agregar_hab(Habitacion(1,"doble",50))
-miHotel.agregar_hab(Habitacion(2,"suite",100))
-miHotel.agregar_hab(Habitacion(3,"individual",30))
-miHotel.agregar_hab(Habitacion(4,"doble",50))
-miHotel.agregar_hab(Habitacion(5,"suite",100))
-miHotel.listar_habitaciones()
-# miHotel.eliminar_hab(6)
-# print("__________________")
-# miHotel.listar_habitaciones()
-
-
-miHotel.resevar_habitacion("juan","suite")
-miHotel.resevar_habitacion("pepe","doble")
-miHotel.listar_habitaciones()
-miHotel.listar_clientes()
-
-miHotel.cancelar_reserva("juan")
-miHotel.listar_habitaciones()
-print("__________________")
-miHotel.listar_clientes()
-
-
-# miHotel.checkin("juan")
-# miHotel.checkout("juan")
-
-# miHotel.resevar_habitacion("perico","doble")
-# miHotel.listar_habitaciones()
-
-# miHotel.resevar_habitacion("andres","individual")
-# miHotel.listar_habitaciones()
-
-# miHotel.resevar_habitacion("maria","suite")
-# miHotel.listar_habitaciones()
-
-# miHotel.resevar_habitacion("eva","doble")
-# miHotel.listar_habitaciones()
-
-# miHotel.resevar_habitacion("ester","doble")
-# miHotel.listar_habitaciones()
-# miHotel.listar_clientes()
-
+#NOTAS:
+# Modificar check out igual al check-in
+#probar bien todas las opciones y control de excepciones
+#limpiar código
+#Documentar
+#Commit y sincronizar GitHub
