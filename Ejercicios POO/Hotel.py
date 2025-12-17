@@ -4,7 +4,6 @@ from Modulo_Menu import Menu
 from datetime import datetime,date
 import random,os,math
 
-
 class Cliente:
     
     def __init__(self,nombre):
@@ -21,7 +20,7 @@ class Habitacion:
     def __init__(self,numero,tipo,precio):
         
         self.numero=numero
-        self.estado="libre" #puede ser "libre" u "ocupada"
+        self.estado="libre" #puede ser "libre" o "reservada"
         self.precio=precio
         
         if self.validar_tipo(tipo):
@@ -40,6 +39,7 @@ class Habitacion:
 
 
 class Hotel:
+    
     def __init__(self,nombre):
         
         self.nombre=nombre
@@ -97,12 +97,11 @@ class Hotel:
         return False
        
     def cancelar_reserva(self,nombre):
-        #NOTA:No se puede cancelar la reserva si hay un checkin hecho
         
         try:
             cliente=buscar_objeto(self.lista_clientes,"nombre",nombre)[0]
             
-            if cliente.fecha_entrada=="":
+            if cliente.fecha_entrada=="": #No se puede cancelar la reserva si hay un checkin hecho
             
                 if self.liberar_habitacion(cliente.numero_habitacion):    
                     self.lista_clientes.remove(cliente)
@@ -115,14 +114,16 @@ class Hotel:
             print("Error: No ha sido posible cancelar la reserva")
             return False
         
+    
     def asignar_habitacion(self,tipo_hab):
-        #el método devuelve la habitación asignada
+        
         habitacion=next((h for h in self.lista_habitaciones if h.tipo==tipo_hab and h.estado=="libre"),None)
         if habitacion !=None:
             habitacion.estado="reservada"
             print(f"La habitación nº{habitacion.numero} ha sido reservada")
             return habitacion
         return None
+    
     
     def liberar_habitacion(self,numero):
         
@@ -135,7 +136,6 @@ class Hotel:
         
     def checkin(self,nombre):
         
-        #registra la fecha de entrada y el tipo de pensión
         while True:
             
             cliente=buscar_objeto(self.lista_clientes,"nombre",nombre)
@@ -178,43 +178,50 @@ class Hotel:
                 
     
     def checkout(self,nombre):
-        #registra la fecha de salida 
-        #Si el checkout se ha realizado correctamente se genera la factura
         
-           while True:
-            try:
-                fecha_salida=input("Introduce la fecha de salida (d-m-a): ")
-                fecha_salida=datetime.strptime(fecha_salida, '%d-%m-%Y')
+        while True:
+            
+            cliente=buscar_objeto(self.lista_clientes,"nombre",nombre)
+            
+            if cliente[1]:
                 
-                cliente=buscar_objeto(self.lista_clientes,"nombre",nombre)
+                if cliente[0].fecha_entrada!="":
+                    while True:
+                        
+                        try:
+                            
+                            fecha_salida=input("Introduce la fecha de entrada (d-m-a): ")
+                            fecha_salida=datetime.strptime(fecha_salida, '%d-%m-%Y')
+                            
+                            if fecha_salida <= cliente[0].fecha_entrada:
+                                print("Error: La fecha de salida debe ser posterior a la de entrada")
+                                return False
+                            
+                            else:
                 
-                if cliente[1]:
-                    
-                    if fecha_salida <= cliente[0].fecha_entrada:
-                        print("Error: La fecha de salida debe ser posterior a la de entrada")
-                        return False
-                    
-                    else:
-                
-                        cliente[0].fecha_salida=fecha_salida
-                        noches = (cliente[0].fecha_salida - cliente[0].fecha_entrada).days
-                    
-                        print(f"Alojamiento de {noches} noches")
-                        self.liberar_habitacion(cliente[0].numero_habitacion)                        
-                        factura=self.Facturar(cliente[0].nombre,noches)
-                        self.lista_clientes.remove(cliente[0])
-                        print(f"Checkout a nombre de {cliente[0].nombre} realizado correctamente\nTotal factura={factura}€\n")
-                        return True
+                                cliente[0].fecha_salida=fecha_salida
+                                noches = (cliente[0].fecha_salida - cliente[0].fecha_entrada).days
+                            
+                                print(f"Alojamiento de {noches} noches")
+                                self.liberar_habitacion(cliente[0].numero_habitacion)                        
+                                factura=self.Facturar(cliente[0].nombre,noches) #Si el checkout se ha realizado correctamente se genera la factura
+                                self.lista_clientes.remove(cliente[0])
+                                print(f"Checkout a nombre de {cliente[0].nombre} realizado correctamente\nTotal factura={factura}€\n")
+                                return True
+                                                        
+                        except:
+                            print("Formato de fecha incorrecto. Inténtalo de nuevo")
+                                        
                 else:
-                    print("Error: No se puede hacer el checkout porque el cliente no tiene reservada la habitacion")
+                    print(f"Error: El cliente {nombre} no tiene un check-in hecho ")
                     return False
-                             
-            except:
-                print("Formato de fecha incorrecto. Inténtalo de nuevo")
-        
+            
+            else:
+                print(f"Error: El cliente {nombre} no tiene una habitación reservada")
+                return False        
                 
     def Facturar(self,nombre,noches):
-        # Precio por hab/noche AD + 10%MP + 20%PC
+        
         # Devuelve el importe de la factura
         
         cliente=buscar_objeto(self.lista_clientes,"nombre",nombre)
@@ -223,7 +230,7 @@ class Hotel:
             pension=cliente[0].pension.lower()
             habitacion=buscar_objeto(self.lista_habitaciones,"numero",cliente[0].numero_habitacion)
             
-            if habitacion[1]:
+            if habitacion[1]: # Precio por hab/noche AD + 10%MP + 20%PC
                 total=habitacion[0].precio*noches
                 if pension=="mp":
                     total*=1.10
@@ -246,7 +253,7 @@ class Hotel:
                 
     
 class Ejecutable:
-    #Contiene el menu de la app para su ejecución
+    
     def __init__(self):
         
         miHotel=Hotel("Juanito's empire")
@@ -295,24 +302,29 @@ class Ejecutable:
                                 tipo_habitacion="suite"
                                 
                             precio=float(input(f"Introduce el precio por noche: "))
+                            
                             if miHotel.agregar_hab(Habitacion(numero,tipo_habitacion,precio)):
                                 print(f"La habitación nº {numero} se ha añadido correctamente")
                            
                             break
                             
                         except:
-                            print("Opción incorrecta")
+                            print("Error: El dato introducido no es correcto")
         
             
                 elif opcion==2:
+                    
                     while True:
+                        
                         try:
                             numero=int(input(f"Introduce el número de habitación: "))
+                            
                             if miHotel.eliminar_hab(numero):
                                 print(f"La habitación nº {numero} se ha eliminado correctamente")
                             else:
                                 print(f"Error: No ha sido posido eliminar la habitación {numero}")
                             break
+                        
                         except:
                             print("Opción incorrecta")
                     
@@ -327,16 +339,22 @@ class Ejecutable:
             elif opcion_elegida == 4: #Actualizar reserva
                 
                 while True:
+                    
                     try:
+                        
                         opcion=int(input(f"1. Añadir reserva\n2. Cancelar reserva\n3. Salir\n"))
+                        
                         if opcion>=1 and opcion<=3:
                             break
                         input("Opción incorrecta")
+                    
                     except:
                         print("Opción incorrecta")
                         
                 if opcion==1:
+                    
                     while True:
+                    
                         try:
                             
                             nombre=input(f"Introduce el nombre del cliente: ")
@@ -353,8 +371,9 @@ class Ejecutable:
                                 print(f"La reserva a nombre de {nombre} se ha realizado correctamente")
                             
                             break
+                        
                         except:
-                            print("Opción incorrecta")
+                            print("Error: No ha sido posible realizar la reserva. Inténtalo de nuevo")
         
             
                 elif opcion==2:
@@ -367,11 +386,15 @@ class Ejecutable:
             elif opcion_elegida == 5: #Actualizar check
                 
                 while True:
+                    
                     try:
                         opcion=int(input(f"1. Check-in\n2. Check-out\n3. Salir\n"))
+                        
                         if opcion>=1 and opcion<=3:
                             break
+                       
                         input("Opción incorrecta")
+                  
                     except:
                         print("Opción incorrecta")
                         
@@ -379,8 +402,7 @@ class Ejecutable:
                     
                     nombre=input(f"Introduce nombre del cliente: ")
                     miHotel.checkin(nombre)
-                        
-                    
+                                            
                 elif opcion==2: #check-out
                     nombre=input(f"Introduce nombre del cliente: ")
                     miHotel.checkout(nombre)
@@ -391,9 +413,12 @@ class Ejecutable:
                 salir=True
     
 
-####################################################
+#########################################################
 
 def buscar_objeto(lista,dato,valor):
+    
+    #Función que recibe una lista de objetos, el dato sería el atributo del objeto y el valor a buscar
+    #Devuelve el objeto buscado y el bool del resultado de la búsqueda
     
     try:
         
@@ -412,11 +437,7 @@ def buscar_objeto(lista,dato,valor):
     
         
 #########################################################
+
 Ejecutable()
 
-#NOTAS:
-# Modificar check out igual al check-in
-#probar bien todas las opciones y control de excepciones
-#limpiar código
-#Documentar
-#Commit y sincronizar GitHub
+
