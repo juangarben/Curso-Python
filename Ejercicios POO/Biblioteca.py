@@ -202,7 +202,7 @@ class Biblioteca:
     #Podríamos incluir un método para añadir y otro para eliminar bibliotecarios (opcional)
     
 class Prestamo:
-    def __init__(self,id_prestamo,biblioteca,libro,usuario):
+    def __init__(self,id_prestamo,biblioteca: Biblioteca,libro: Libro,usuario: Usuario):
         
         self.id=id_prestamo
         self.biblioteca=biblioteca
@@ -256,7 +256,6 @@ class Ejecutable:
         3. Gestionar prestamos
             3.1 Iniciar prestamo
             3.2 Finalizar prestamo
-            3.3 Listar prestamos
         4. Salir
         """
         lista_menu=[
@@ -266,6 +265,7 @@ class Ejecutable:
                     ]
         
         salir=False
+        id_prestamo=0
     
         while not salir:
             os.system('cls')
@@ -408,38 +408,76 @@ class Ejecutable:
                         print("Opción incorrecta")
                             
                 if opcion==1:
-                    pass
+                    miBiblioteca.registrar_usuario()
                 
                 elif opcion==2:
-                    pass
+                    miBiblioteca.eliminar_usuario()
                 
                 elif opcion==3:
-                    pass
-                
-                
+                    miBiblioteca.listar_usuarios()
+                            
                 input("Presiona Enter para continuar...")
             
             elif opcion_elegida == 3: # 3. Gestionar préstamos
                 
                 while True:
                     try:
-                        opcion=int(input(f"1. Iniciar préstamo\n2. Finalizar préstamo\n3. Listar Préstamos\n4. Salir\n"))
-                        if opcion>=1 and opcion<=4:
+                        opcion=int(input(f"1. Iniciar préstamo\n2. Finalizar préstamo\n3. Salir\n"))
+                        if opcion>=1 and opcion<=3:
                             break
                         input("Opción incorrecta")
                     except:
                         print("Opción incorrecta")
                             
-                if opcion==1:
-                    pass
-                
-                elif opcion==2:
-                    pass
-                
-                elif opcion==3:
-                    pass
-                
-                
+                if opcion==1: # Iniciar préstamo
+                    
+                    id_prestamo+=1
+                    while True:
+                        try:
+                            
+                            isbn=int(input(f"Introduce el ISBN del libro para préstamo: "))
+                            id_usuario=int(input(f"Introduce el ID del usuario: "))
+                            break
+                        
+                        except:
+                            print("Error: Entrada de datos incorrecta")
+                    
+                    libro=buscar_objeto(miBiblioteca.libros,"isbn",isbn)
+                    usuario=buscar_objeto(miBiblioteca.usuarios,"id",id_usuario)
+                    
+                    if libro[1] and usuario[1]:
+                        
+                        miPrestamo=Prestamo(id_prestamo,miBiblioteca,libro[0],usuario[0])
+                        miPrestamo.iniciar_prestamo()
+                        print("Préstamo realizado correctamente")
+                        
+                    else:
+                        print("Error: No ha sido posible realizar el préstamo")
+                        
+                                    
+                elif opcion==2:# Finalizar préstamo
+                    
+                    while True:
+                        try:
+                            
+                            isbn=int(input(f"Introduce el ISBN del libro para finalizar préstamo: "))
+                            id_usuario=int(input(f"Introduce el ID del usuario: "))
+                            break
+                        
+                        except:
+                            print("Error: Entrada de datos incorrecta")
+                    
+                    libro=buscar_objeto(miBiblioteca.libros,"isbn",isbn)
+                    usuario=buscar_objeto(miBiblioteca.usuarios,"id",id_usuario)
+                    
+                    if libro[1] and usuario[1]:
+                        
+                        miPrestamo=Prestamo(id_prestamo,miBiblioteca,libro[0],usuario[0])
+                        miPrestamo.finalizar_prestamo()
+                                            
+                    else:
+                        print("Error: No ha sido posible finalizar el préstamo")
+                                    
                 input("Presiona Enter para continuar...")
                                   
             else:
@@ -470,37 +508,4 @@ def buscar_objeto(lista,dato,valor):
 #######################################################################################
 
 Ejecutable()
-
-# libro_1=Libro("El señor de los anillos","JR Tolkien",12345,"Altaya",1980)
-# libro_2=Libro("Los pilares de la tierra","Ken Follet",6789,"perico",1995)
-
-# u1=Usuario(1,"juan","juanito@gmail.com")
-# u2=Usuario(2,"mario","marianico@gmail.com")
-
-# miBiblioteca=Biblioteca()
-
-# miBibiotecario=Bibliotecario(1,"juan")
-
-# miBibiotecario.añadir_libro(miBiblioteca,libro_1)
-# miBibiotecario.añadir_libro(miBiblioteca,libro_2)
-# miBiblioteca.listar_libros()
-# # # resultado_busqueda=miBibiotecario.buscar_libro(miBiblioteca,"isbn","1234")
-# # # for resultado in resultado_busqueda:
-# # #     print(resultado)
-# # print(miBibiotecario.eliminar_libro(miBiblioteca))
-# # miBiblioteca.listar_libros()
-# print("prestamos libro 1")
-# p1=Prestamo("p1",miBiblioteca,libro_1,u1)
-# p1.iniciar_prestamo()
-# u1.mostrar_usuario()
-# print("prestamos libro 2")
-# p2=Prestamo("p1",miBiblioteca,libro_2,u2)
-# p2.iniciar_prestamo()
-# u2.mostrar_usuario()
-# print("############## LIBROS BIBLIOTECA ##########")
-# miBiblioteca.listar_libros()
-# print("devolvemos libro 1")
-# p1.finalizar_prestamo()
-# print("############## LIBROS BIBLIOTECA ##########")
-# miBiblioteca.listar_libros()
 
