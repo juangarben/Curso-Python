@@ -1,0 +1,20 @@
+[
+    {
+        "device": "luz cocina",
+        "type": "Light",
+        "on": true,
+        "brightness": 80
+    },
+    {
+        "device": "Termostato",
+        "type": "Thermostat",
+        "on": true,
+        "temperature": 23
+    },
+    {
+        "device": "c\u00e1mara entrada",
+        "type": "Camera",
+        "on": true,
+        "recording": false
+    }
+]
