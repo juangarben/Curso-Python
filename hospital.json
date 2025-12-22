@@ -1,0 +1,50 @@
+{
+    "pacientes": [
+        {
+            "id_paciente": 1,
+            "nombre": "juan",
+            "edad": 47,
+            "genero": "hombre",
+            "historial": [],
+            "citas": [
+                {
+                    "medico": "pepe",
+                    "fecha": "22-12-2025"
+                }
+            ]
+        },
+        {
+            "id_paciente": 22,
+            "nombre": "maria",
+            "edad": 34,
+            "genero": "mujer",
+            "historial": [],
+            "citas": [
+                {
+                    "medico": "pepe",
+                    "fecha": "22-12-2025"
+                }
+            ]
+        }
+    ],
+    "medicos": [
+        {
+            "id_medico": 1,
+            "nombre": "pepe",
+            "edad": 30,
+            "genero": "hombre",
+            "especialidad": "pediatra",
+            "pacientes": [],
+            "citas": [
+                {
+                    "paciente": "juan",
+                    "fecha": "22-12-2025"
+                },
+                {
+                    "paciente": "maria",
+                    "fecha": "22-12-2025"
+                }
+            ]
+        }
+    ]
+}
