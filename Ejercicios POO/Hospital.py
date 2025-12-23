@@ -93,7 +93,7 @@ class Paciente (Persona):
             "edad": self.edad,
             "genero": self.genero,
             "historial": [d.to_dict() for d in self.historial],
-            "citas": self.citas
+            "citas": [c.to_dict() for c in self.citas]
         }
 
 
@@ -130,7 +130,7 @@ class Medico (Persona):
             "genero": self.genero,
             "especialidad": self.especialidad,
             "pacientes": [p.id_paciente for p in self.pacientes],
-            "citas": self.citas
+            "citas": [c.to_dict() for c in self.citas]
         }
     
 
@@ -142,9 +142,9 @@ class Cita:
         self.medico=medico
         self.fecha_hora=fecha_hora
         
-    def __str__(self):
+    def to_dict(self):
         
-        return {"Medico":self.medico,
+        return {"Medico":self.medico.id_medico,
                 "Fecha_hora":self.fecha_hora}
 
 class Hospital:
@@ -183,64 +183,96 @@ class Hospital:
         else:
             print("Paciente o médico no encontrado.")
 
-#     # ----- Estadísticas -----
-#     def estadisticas(self):
-#         print("\n--- Estadísticas del Hospital ---")
-#         # Pacientes por especialidad
-#         espec_dict = {}
-#         for medico in self.medicos:
-#             espec_dict[medico.especialidad] = espec_dict.get(medico.especialidad, 0) + len(medico.pacientes)
-#         print("Pacientes por especialidad:", espec_dict)
+    # ----- Estadísticas -----
+    def estadisticas(self):
+        print("\n--- Estadísticas del Hospital ---")
+        # Pacientes por especialidad
+        espec_dict = {}
+        for medico in self.medicos:
+            espec_dict[medico.especialidad] = espec_dict.get(medico.especialidad, 0) + len(medico.pacientes)
+        print("Pacientes por especialidad:", espec_dict)
 
-#         # Diagnósticos más comunes
-#         diag_count = {}
-#         for paciente in self.pacientes:
-#             for diag in paciente.historial:
-#                 diag_count[diag.diagnostico] = diag_count.get(diag.diagnostico, 0) + 1
-#         print("Diagnósticos más comunes:", diag_count)
+        # Diagnósticos más comunes
+        diag_count = {}
+        for paciente in self.pacientes:
+            for diag in paciente.historial:
+                diag_count[diag.diagnostico] = diag_count.get(diag.diagnostico, 0) + 1
+        print("Diagnósticos más comunes:", diag_count)
 
-#     # ----- Persistencia -----
-#     def guardar_datos(self, archivo="hospital.json"):
-#         data = {
-#             "pacientes": [p.to_dict() for p in self.pacientes],
-#             "medicos": [m.to_dict() for m in self.medicos]
-#         }
-#         with open(archivo, "w") as f:
-#             json.dump(data, f, indent=4)
-#         print("Datos guardados correctamente.")
+    # ----- Persistencia -----
+    def guardar_datos(self, archivo="hospital.json"):
+        data = {
+            "pacientes": [p.to_dict() for p in self.pacientes],
+            "medicos": [m.to_dict() for m in self.medicos]
+        }
+        with open(archivo, "w") as f:
+            json.dump(data, f, indent=4)
+        print("Datos guardados correctamente.")
 
-#     def cargar_datos(self, archivo="hospital.json"):
-#         try:
-#             with open(archivo, "r") as f:
-#                 data = json.load(f)
-#             # Cargar pacientes
-#             self.pacientes = []
-#             for p_data in data["pacientes"]:
-#                 paciente = Paciente(p_data["nombre"], p_data["edad"], p_data["genero"], p_data["id_paciente"])
-#                 for diag_data in p_data["historial"]:
-#                     diag = Diagnostico(diag_data["sintomas"], diag_data["diagnostico"], diag_data["tratamiento"])
-#                     diag.fecha = diag_data["fecha"]
-#                     paciente.agregar_diagnostico(diag)
-#                 paciente.citas = p_data.get("citas", [])
-#                 self.pacientes.append(paciente)
-#             # Cargar médicos
-#             self.medicos = []
-#             for m_data in data["medicos"]:
-#                 medico = Medico(m_data["nombre"], m_data["edad"], m_data["genero"], m_data["id_medico"], m_data["especialidad"])
-#                 medico.citas = m_data.get("citas", [])
-#                 # Reconectar pacientes a médicos
-#                 for pid in m_data.get("pacientes", []):
-#                     paciente = self.buscar_paciente(pid)
-#                     if paciente:
-#                         medico.agregar_paciente(paciente)
-#                 self.medicos.append(medico)
-#             print("Datos cargados correctamente.")
-#         except FileNotFoundError:
-#             print("Archivo de datos no encontrado. Se iniciará con hospital vacío.")
+    def cargar_datos(self, archivo="hospital.json"):
+        try:
+            with open(archivo, "r") as f:
+                data = json.load(f)
+
+            # Limpiar datos actuales
+            self.pacientes = []
+            self.medicos = []
+
+            # 1️⃣ Cargar médicos (sin relaciones)
+            for m_data in data["medicos"]:
+                medico = Medico(
+                    m_data["nombre"],
+                    m_data["edad"],
+                    m_data["genero"],
+                    m_data["id_medico"],
+                    m_data["especialidad"]
+                )
+                self.medicos.append(medico)
+
+            # 2️⃣ Cargar pacientes + diagnósticos + citas
+            for p_data in data["pacientes"]:
+                paciente = Paciente(
+                    p_data["nombre"],
+                    p_data["edad"],
+                    p_data["genero"],
+                    p_data["id_paciente"]
+                )
+
+                # Diagnósticos
+                for diag_data in p_data["historial"]:
+                    diag = Diagnostico(
+                        diag_data["sintomas"],
+                        diag_data["diagnostico"],
+                        diag_data["tratamiento"]
+                    )
+                    diag.fecha = diag_data["fecha"]
+                    paciente.agregar_diagnostico(diag)
+
+                # Citas
+                for c_data in p_data.get("citas", []):
+                    medico = self.buscar_medico(c_data["Medico"])
+                    if medico:
+                        cita = Cita(medico, c_data["Fecha_hora"])
+                        paciente.citas.append(cita)
+
+                self.pacientes.append(paciente)
+
+            # 3️⃣ Reconectar pacientes con médicos
+            for m_data in data["medicos"]:
+                medico = self.buscar_medico(m_data["id_medico"])
+                for pid in m_data.get("pacientes", []):
+                    paciente = self.buscar_paciente(pid)
+                    if medico and paciente:
+                        medico.agregar_paciente(paciente)
+
+            print("Datos cargados correctamente.")
+
+        except FileNotFoundError:
+            print("Archivo de datos no encontrado. Se iniciará con hospital vacío.")
 
 # ---------------- Ejemplo de uso ----------------
 hospital = Hospital()
-#hospital.cargar_datos()
+hospital.cargar_datos()
 
 # Crear médicos
 med1 = Medico("Dr. Juan", 45, "Masculino", 101, "Cardiología")
@@ -262,11 +294,11 @@ med2.diagnosticar(pac2, "Fiebre alta", "Gripe", "Reposo y medicación")
 hospital.agendar_cita(201, 101, "2026-12-25 10:00")
 hospital.agendar_cita(202, 102, "2026-12-26 14:00")
 
-# # Mostrar estadísticas
-# hospital.estadisticas()
+# Mostrar estadísticas
+hospital.estadisticas()
 
-# # Guardar datos
-# hospital.guardar_datos()
+# Guardar datos
+hospital.guardar_datos()
 
         
 class Ejecutar:

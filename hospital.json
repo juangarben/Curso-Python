@@ -1,50 +1,244 @@
 {
     "pacientes": [
         {
-            "id_paciente": 1,
-            "nombre": "juan",
-            "edad": 47,
-            "genero": "hombre",
-            "historial": [],
+            "id_paciente": 201,
+            "nombre": "Carlos",
+            "edad": 30,
+            "genero": "Masculino",
+            "historial": [
+                {
+                    "fecha": "2025-12-23 12:10",
+                    "sintomas": "Dolor en el pecho",
+                    "diagnostico": "Angina",
+                    "tratamiento": "Medicamentos"
+                }
+            ],
             "citas": [
                 {
-                    "medico": "pepe",
-                    "fecha": "22-12-2025"
+                    "Medico": 101,
+                    "Fecha_hora": "2026-12-25 10:00"
+                },
+                {
+                    "Medico": 101,
+                    "Fecha_hora": "2026-12-25 10:00"
+                },
+                {
+                    "Medico": 101,
+                    "Fecha_hora": "2026-12-25 10:00"
+                },
+                {
+                    "Medico": 101,
+                    "Fecha_hora": "2026-12-25 10:00"
                 }
             ]
         },
         {
-            "id_paciente": 22,
-            "nombre": "maria",
-            "edad": 34,
-            "genero": "mujer",
-            "historial": [],
+            "id_paciente": 202,
+            "nombre": "Luc\u00eda",
+            "edad": 7,
+            "genero": "Femenino",
+            "historial": [
+                {
+                    "fecha": "2025-12-23 12:10",
+                    "sintomas": "Fiebre alta",
+                    "diagnostico": "Gripe",
+                    "tratamiento": "Reposo y medicaci\u00f3n"
+                }
+            ],
             "citas": [
                 {
-                    "medico": "pepe",
-                    "fecha": "22-12-2025"
+                    "Medico": 102,
+                    "Fecha_hora": "2026-12-26 14:00"
+                },
+                {
+                    "Medico": 102,
+                    "Fecha_hora": "2026-12-26 14:00"
+                },
+                {
+                    "Medico": 102,
+                    "Fecha_hora": "2026-12-26 14:00"
+                },
+                {
+                    "Medico": 102,
+                    "Fecha_hora": "2026-12-26 14:00"
                 }
             ]
+        },
+        {
+            "id_paciente": 201,
+            "nombre": "Carlos",
+            "edad": 30,
+            "genero": "Masculino",
+            "historial": [
+                {
+                    "fecha": "2025-12-23 12:10",
+                    "sintomas": "Dolor en el pecho",
+                    "diagnostico": "Angina",
+                    "tratamiento": "Medicamentos"
+                }
+            ],
+            "citas": []
+        },
+        {
+            "id_paciente": 202,
+            "nombre": "Luc\u00eda",
+            "edad": 7,
+            "genero": "Femenino",
+            "historial": [
+                {
+                    "fecha": "2025-12-23 12:10",
+                    "sintomas": "Fiebre alta",
+                    "diagnostico": "Gripe",
+                    "tratamiento": "Reposo y medicaci\u00f3n"
+                }
+            ],
+            "citas": []
+        },
+        {
+            "id_paciente": 201,
+            "nombre": "Carlos",
+            "edad": 30,
+            "genero": "Masculino",
+            "historial": [
+                {
+                    "fecha": "2025-12-23 12:10",
+                    "sintomas": "Dolor en el pecho",
+                    "diagnostico": "Angina",
+                    "tratamiento": "Medicamentos"
+                }
+            ],
+            "citas": []
+        },
+        {
+            "id_paciente": 202,
+            "nombre": "Luc\u00eda",
+            "edad": 7,
+            "genero": "Femenino",
+            "historial": [
+                {
+                    "fecha": "2025-12-23 12:10",
+                    "sintomas": "Fiebre alta",
+                    "diagnostico": "Gripe",
+                    "tratamiento": "Reposo y medicaci\u00f3n"
+                }
+            ],
+            "citas": []
+        },
+        {
+            "id_paciente": 201,
+            "nombre": "Carlos",
+            "edad": 30,
+            "genero": "Masculino",
+            "historial": [
+                {
+                    "fecha": "2025-12-23 12:11",
+                    "sintomas": "Dolor en el pecho",
+                    "diagnostico": "Angina",
+                    "tratamiento": "Medicamentos"
+                }
+            ],
+            "citas": []
+        },
+        {
+            "id_paciente": 202,
+            "nombre": "Luc\u00eda",
+            "edad": 7,
+            "genero": "Femenino",
+            "historial": [
+                {
+                    "fecha": "2025-12-23 12:11",
+                    "sintomas": "Fiebre alta",
+                    "diagnostico": "Gripe",
+                    "tratamiento": "Reposo y medicaci\u00f3n"
+                }
+            ],
+            "citas": []
         }
     ],
     "medicos": [
         {
-            "id_medico": 1,
-            "nombre": "pepe",
-            "edad": 30,
-            "genero": "hombre",
-            "especialidad": "pediatra",
+            "id_medico": 101,
+            "nombre": "Dr. Juan",
+            "edad": 45,
+            "genero": "Masculino",
+            "especialidad": "Cardiolog\u00eda",
+            "pacientes": [
+                201,
+                201,
+                201
+            ],
+            "citas": []
+        },
+        {
+            "id_medico": 102,
+            "nombre": "Dra. Ana",
+            "edad": 38,
+            "genero": "Femenino",
+            "especialidad": "Pediatr\u00eda",
+            "pacientes": [
+                202,
+                202,
+                202
+            ],
+            "citas": []
+        },
+        {
+            "id_medico": 101,
+            "nombre": "Dr. Juan",
+            "edad": 45,
+            "genero": "Masculino",
+            "especialidad": "Cardiolog\u00eda",
             "pacientes": [],
-            "citas": [
-                {
-                    "paciente": "juan",
-                    "fecha": "22-12-2025"
-                },
-                {
-                    "paciente": "maria",
-                    "fecha": "22-12-2025"
-                }
-            ]
+            "citas": []
+        },
+        {
+            "id_medico": 102,
+            "nombre": "Dra. Ana",
+            "edad": 38,
+            "genero": "Femenino",
+            "especialidad": "Pediatr\u00eda",
+            "pacientes": [],
+            "citas": []
+        },
+        {
+            "id_medico": 101,
+            "nombre": "Dr. Juan",
+            "edad": 45,
+            "genero": "Masculino",
+            "especialidad": "Cardiolog\u00eda",
+            "pacientes": [],
+            "citas": []
+        },
+        {
+            "id_medico": 102,
+            "nombre": "Dra. Ana",
+            "edad": 38,
+            "genero": "Femenino",
+            "especialidad": "Pediatr\u00eda",
+            "pacientes": [],
+            "citas": []
+        },
+        {
+            "id_medico": 101,
+            "nombre": "Dr. Juan",
+            "edad": 45,
+            "genero": "Masculino",
+            "especialidad": "Cardiolog\u00eda",
+            "pacientes": [
+                201
+            ],
+            "citas": []
+        },
+        {
+            "id_medico": 102,
+            "nombre": "Dra. Ana",
+            "edad": 38,
+            "genero": "Femenino",
+            "especialidad": "Pediatr\u00eda",
+            "pacientes": [
+                202
+            ],
+            "citas": []
         }
     ]
 }
