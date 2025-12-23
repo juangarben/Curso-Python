@@ -1,3 +1,38 @@
+"""Proyecto: Sistema de Hospital
+Clases principales
+
+Persona (base)
+
+Atributos: nombre, edad, genero
+
+Métodos: mostrar_info()
+
+Paciente (hereda de Persona)
+
+Atributos: historial (lista de Diagnostico), id_paciente
+
+Métodos: agregar_diagnostico(), mostrar_historial()
+
+Medico (hereda de Persona)
+
+Atributos: especialidad, id_medico, pacientes (lista de Paciente)
+
+Métodos: diagnosticar(), agregar_paciente()
+
+Diagnostico
+
+Atributos: fecha, sintomas, diagnostico, tratamiento
+
+Método: mostrar_diagnostico()
+
+Hospital
+
+Atributos: pacientes, medicos
+
+Métodos: agregar_paciente(), agregar_medico(), buscar_paciente(), buscar_medico(), mostrar_todo()
+
+Funciona como contenedor de todos los objetos, usando composición.
+"""
 import json
 from datetime import datetime
 
@@ -234,3 +269,84 @@ class Hospital:
 
         except FileNotFoundError:
             print("Archivo de datos no encontrado. Se iniciará con hospital vacío.")
+
+# ---------------- Ejemplo de uso ----------------
+hospital = Hospital()
+hospital.cargar_datos()
+
+# Crear médicos
+med1 = Medico("Dr. Juan", 45, "Masculino", 101, "Cardiología")
+med2 = Medico("Dra. Ana", 38, "Femenino", 102, "Pediatría")
+hospital.agregar_medico(med1)
+hospital.agregar_medico(med2)
+
+# Crear pacientes
+pac1 = Paciente("Carlos", 30, "Masculino", 201)
+pac2 = Paciente("Lucía", 7, "Femenino", 202)
+hospital.agregar_paciente(pac1)
+hospital.agregar_paciente(pac2)
+
+# Diagnósticos
+med1.diagnosticar(pac1, "Dolor en el pecho", "Angina", "Medicamentos")
+med2.diagnosticar(pac2, "Fiebre alta", "Gripe", "Reposo y medicación")
+
+# Agendar citas
+hospital.agendar_cita(201, 101, "2026-12-25 10:00")
+hospital.agendar_cita(202, 102, "2026-12-26 14:00")
+
+# Mostrar estadísticas
+hospital.estadisticas()
+
+# Guardar datos
+hospital.guardar_datos()
+
+        
+class Ejecutar:
+    pass
+
+#########################
+#Ejecutar()
+
+# Esta versión incluirá:
+
+# Persistencia de datos con JSON (guardar y cargar pacientes, médicos y diagnósticos).
+
+# Agenda de citas automática.
+
+# Búsqueda avanzada de pacientes y médicos.
+
+# Estadísticas del hospital (pacientes por especialidad, diagnósticos más comunes).
+
+
+
+
+
+
+
+
+# #Ejemplo de uso
+# hospital = Hospital()
+
+# # Crear médicos
+# med1 = Medico("Dr. Juan", 45, "Masculino", "Cardiología",101)
+# med2 = Medico("Dra. Ana", 38, "Femenino", "Pediatría",102)
+# hospital.agregar_medico(med1)
+# hospital.agregar_medico(med2)
+
+# # Crear pacientes
+# pac1 = Paciente("Carlos", 30, "Masculino", 201)
+# pac2 = Paciente("Lucía", 7, "Femenino", 202)
+# hospital.agregar_paciente(pac1)
+# hospital.agregar_paciente(pac2)
+
+# # Diagnosticar pacientes
+# med1.diagnosticar(pac1, "Dolor en el pecho", "Angina", "Medicamentos")
+# med2.diagnosticar(pac2, "Fiebre alta", "Gripe", "Reposo y medicación")
+
+# # Mostrar historial
+# pac1.mostrar_historial()
+# pac2.mostrar_historial()
+
+# # Mostrar hospital completo
+# hospital.mostrar_todo()
+
