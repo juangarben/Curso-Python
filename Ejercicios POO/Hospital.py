@@ -79,15 +79,13 @@ class Paciente (Persona):
         
         self.historial.append(diagnostico)
         
-    def agregar_cita(self):
-        pass
-        
+    def agendar_cita(self,medico,fecha_hora):
+        self.citas.append(Cita(medico,fecha_hora))
         
     def mostrar_historial(self):
         for historial in self.historial:
             print(historial)
             
-    
     def to_dict(self):
         return {
             "id_paciente": self.id_paciente,
@@ -100,7 +98,7 @@ class Paciente (Persona):
 
 
 class Medico (Persona):
-    def __init__(self, nombre, edad, genero,especialidad,id_medico):
+    def __init__(self, nombre, edad, genero,id_medico,especialidad):
         super().__init__(nombre, edad, genero)
         self.nombre=nombre
         self.edad=edad
@@ -134,7 +132,20 @@ class Medico (Persona):
             "pacientes": [p.id_paciente for p in self.pacientes],
             "citas": self.citas
         }
+    
 
+
+
+class Cita:
+    def __init__(self,medico:Medico,fecha_hora):
+        
+        self.medico=medico
+        self.fecha_hora=fecha_hora
+        
+    def __str__(self):
+        
+        return {"Medico":self.medico,
+                "Fecha_hora":self.fecha_hora}
 
 class Hospital:
     def __init__(self):
@@ -162,15 +173,15 @@ class Hospital:
             print(m)
         print("============================")
             
-#     # ----- Citas -----
-#     def agendar_cita(self, id_paciente, id_medico, fecha_hora):
-#         paciente = self.buscar_paciente(id_paciente)
-#         medico = self.buscar_medico(id_medico)
-#         if paciente and medico:
-#             paciente.agendar_cita(medico, fecha_hora)
-#             print(f"Cita agendada para {paciente.nombre} con {medico.nombre} el {fecha_hora}")
-#         else:
-#             print("Paciente o médico no encontrado.")
+    # ----- Citas -----
+    def agendar_cita(self, id_paciente, id_medico, fecha_hora):
+        paciente = self.buscar_paciente(id_paciente)
+        medico = self.buscar_medico(id_medico)
+        if paciente and medico:
+            paciente.agendar_cita(medico, fecha_hora)
+            print(f"Cita agendada para {paciente.nombre} con {medico.nombre} el {fecha_hora}")
+        else:
+            print("Paciente o médico no encontrado.")
 
 #     # ----- Estadísticas -----
 #     def estadisticas(self):
@@ -227,39 +238,35 @@ class Hospital:
 #         except FileNotFoundError:
 #             print("Archivo de datos no encontrado. Se iniciará con hospital vacío.")
 
-# # ---------------- Ejemplo de uso ----------------
-# hospital = Hospital()
-# hospital.cargar_datos()
+# ---------------- Ejemplo de uso ----------------
+hospital = Hospital()
+#hospital.cargar_datos()
 
-# # Crear médicos
-# med1 = Medico("Dr. Juan", 45, "Masculino", 101, "Cardiología")
-# med2 = Medico("Dra. Ana", 38, "Femenino", 102, "Pediatría")
-# hospital.agregar_medico(med1)
-# hospital.agregar_medico(med2)
+# Crear médicos
+med1 = Medico("Dr. Juan", 45, "Masculino", 101, "Cardiología")
+med2 = Medico("Dra. Ana", 38, "Femenino", 102, "Pediatría")
+hospital.agregar_medico(med1)
+hospital.agregar_medico(med2)
 
-# # Crear pacientes
-# pac1 = Paciente("Carlos", 30, "Masculino", 201)
-# pac2 = Paciente("Lucía", 7, "Femenino", 202)
-# hospital.agregar_paciente(pac1)
-# hospital.agregar_paciente(pac2)
+# Crear pacientes
+pac1 = Paciente("Carlos", 30, "Masculino", 201)
+pac2 = Paciente("Lucía", 7, "Femenino", 202)
+hospital.agregar_paciente(pac1)
+hospital.agregar_paciente(pac2)
 
-# # Diagnósticos
-# med1.diagnosticar(pac1, "Dolor en el pecho", "Angina", "Medicamentos")
-# med2.diagnosticar(pac2, "Fiebre alta", "Gripe", "Reposo y medicación")
+# Diagnósticos
+med1.diagnosticar(pac1, "Dolor en el pecho", "Angina", "Medicamentos")
+med2.diagnosticar(pac2, "Fiebre alta", "Gripe", "Reposo y medicación")
 
-# # Agendar citas
-# hospital.agendar_cita(201, 101, "2026-12-25 10:00")
-# hospital.agendar_cita(202, 102, "2026-12-26 14:00")
+# Agendar citas
+hospital.agendar_cita(201, 101, "2026-12-25 10:00")
+hospital.agendar_cita(202, 102, "2026-12-26 14:00")
 
 # # Mostrar estadísticas
 # hospital.estadisticas()
 
 # # Guardar datos
 # hospital.guardar_datos()
-
-
-
-
 
         
 class Ejecutar:
